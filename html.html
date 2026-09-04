@@ -1,0 +1,1699 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Relatório RSC-PCCTAE - Ferramenta Universal</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { font-family: Inter, "Segoe UI", sans-serif; padding: 40px; color: #333; line-height: 1.6; font-size: 15px; max-width: 1200px; margin: 0 auto; background: #f8fafc; }
+  
+  .container { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+  
+  .header { text-align: center; margin-bottom: 40px; border-bottom: 2px solid #2563eb; padding-bottom: 20px; }
+  .header .institution { font-size: 16px; font-weight: bold; margin: 0; text-transform: uppercase; color: #000; }
+  .header h1 { font-size: 20px; color: #1e293b; margin: 0; text-transform: uppercase; margin-top: 10px; }
+  
+  .section-title { font-weight: bold; font-size: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; margin-bottom: 15px; margin-top: 30px; color: #1e293b; text-transform: uppercase; }
+  
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .box { background: #f1f5f9; padding: 12px 15px; border-radius: 8px; border: 1px solid #e2e8f0; }
+  .box label { font-size: 11px; font-weight: bold; color: #64748b; text-transform: uppercase; display: block; margin-bottom: 4px; }
+  .box input, .box select { width: 100%; padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 14px; background: #fff; }
+  
+  .config-box { background: #eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid #3b82f6; }
+  
+  /* REQUISITO GROUP STYLES */
+  .req-group { margin-bottom: 35px; border-radius: 8px; border: 1px solid #cbd5e1; background: #fff; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+  .req-group-header { background: #334155; color: white; padding: 12px 20px; font-weight: bold; font-size: 16px; letter-spacing: 0.05em; text-transform: uppercase; }
+  .criteria-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .criteria-table th { background: #f8fafc; color: #475569; padding: 12px 20px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #cbd5e1; }
+  .criteria-table td { padding: 25px 20px; border-bottom: 2px solid #e2e8f0; vertical-align: top; }
+  
+  .qty-input { width: 80px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; text-align: center; font-weight: bold; font-size: 15px; }
+  .obs-textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; resize: vertical; min-height: 50px; font-family: inherit; margin-top: 10px; }
+  
+  .doc-parecer-row td { background: #f8fafc; padding: 15px 20px 25px 40px !important; border-top: 1px dashed #cbd5e1; border-bottom: 4px solid #cbd5e1 !important; }
+  .doc-parecer-item { display: grid; grid-template-columns: 2fr 1fr 3fr; gap: 12px; align-items: flex-start; margin-bottom: 10px; background: #fff; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+  .doc-name { font-size: 13px; font-weight: 600; color: #334155; word-break: break-all; margin-bottom: 4px; }
+  .doc-link-input { width: 100%; padding: 4px 8px; border: 1px dashed #cbd5e1; border-radius: 4px; font-size: 11px; background: #f8fafc; }
+  .doc-link-btn { display: inline-block; margin-left: 8px; font-size: 11px; color: #2563eb; text-decoration: none; font-weight: bold; background: #eff6ff; padding: 2px 6px; border-radius: 4px; border: 1px solid #bfdbfe; }
+  .doc-link-btn:hover { background: #dbeafe; text-decoration: underline; }
+  .doc-status { padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; font-weight: 500; }
+  .doc-just { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; resize: vertical; min-height: 36px; font-family: inherit; }
+  
+  .add-form { background: #f8fafc; padding: 25px; border: 2px dashed #94a3b8; border-radius: 8px; margin-bottom: 30px; }
+  .add-form h3 { margin-top: 0; font-size: 15px; color: #334155; text-transform: uppercase; }
+  .add-grid { display: grid; grid-template-columns: 1fr 3fr 1.5fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .add-grid input, .add-grid select, .add-grid textarea { padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 14px; width: 100%; }
+  
+  .btn { background: #2563eb; color: white; border: none; padding: 10px 20px; font-size: 14px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+  .btn:hover { background: #1d4ed8; }
+  .btn-danger { background: #ef4444; }
+  .btn-danger:hover { background: #dc2626; }
+  .btn-success { background: #10b981; }
+  .btn-success:hover { background: #059669; }
+  .btn-secondary { background: #64748b; }
+  .btn-secondary:hover { background: #475569; }
+  .btn-remove { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; }
+  .btn-remove:hover { background: #fecaca; }
+  
+  .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
+  .summary-card { background: #fff; border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+  .summary-card .label { font-size: 12px; color: #64748b; text-transform: uppercase; font-weight: bold; }
+  .summary-card .value { font-size: 28px; font-weight: bold; color: #0f172a; margin-top: 8px; }
+  .summary-card.highlight { background: #eff6ff; border-color: #bfdbfe; }
+  .summary-card.highlight .value { color: #2563eb; }
+  
+  .checklist { background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; margin-top: 25px; }
+  .checklist-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed #cbd5e1; font-size: 15px; }
+  .checklist-item:last-child { border-bottom: none; }
+  .check-icon { font-weight: bold; font-size: 18px; }
+  .check-pass { color: #10b981; }
+  .check-fail { color: #ef4444; }
+  
+  .final-status { text-align: center; padding: 25px; margin-top: 25px; border-radius: 8px; font-size: 22px; font-weight: bold; text-transform: uppercase; }
+  .status-aprovado { background: #d1fae5; color: #065f46; border: 2px solid #34d399; }
+  .status-reprovado { background: #fee2e2; color: #991b1b; border: 2px solid #f87171; }
+  
+  .req-table { width: 100%; border-collapse: collapse; margin-top: 15px; border: 1px solid #e2e8f0; font-size: 15px; }
+  .req-table th { background: #475569; color: white; padding: 12px; text-align: left; font-size: 13px; text-transform: uppercase; }
+  .req-table td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
+  
+  .toolbar { background: #fff; margin-bottom: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; overflow: hidden; }
+  .toolbar-brand { background: linear-gradient(135deg, #1e293b, #334155); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .toolbar-brand h2 { margin: 0; color: #fff; font-size: 16px; font-weight: 700; letter-spacing: 0.02em; display: flex; align-items: center; gap: 10px; }
+  .toolbar-brand h2 i { color: #60a5fa; font-size: 18px; }
+  .toolbar-body { padding: 16px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .toolbar-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .toolbar-row .row-label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; min-width: 85px; }
+  .toolbar-row select { padding: 7px 12px; border-radius: 6px; border: 1px solid #cbd5e1; background: #f8fafc; font-size: 13px; font-family: inherit; min-width: 260px; color: #334155; outline: none; transition: border-color 0.2s; }
+  .toolbar-row select:focus { border-color: #3b82f6; }
+  .toolbar-sep { width: 1px; height: 28px; background: #e2e8f0; margin: 0 4px; flex-shrink: 0; }
+  .toolbar-actions { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; justify-content: flex-end; }
+  .tbtn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; font-size: 13px; font-weight: 600; border-radius: 6px; border: 1px solid transparent; cursor: pointer; transition: all 0.15s ease; font-family: inherit; white-space: nowrap; }
+  .tbtn i { font-size: 13px; }
+  .tbtn-outline { background: #fff; color: #475569; border-color: #cbd5e1; }
+  .tbtn-outline:hover { background: #f1f5f9; border-color: #94a3b8; }
+  .tbtn-red { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+  .tbtn-red:hover { background: #fee2e2; border-color: #fca5a5; }
+  .tbtn-blue { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+  .tbtn-blue:hover { background: #dbeafe; border-color: #93c5fd; }
+  .tbtn-amber { background: #fffbeb; color: #d97706; border-color: #fde68a; }
+  .tbtn-amber:hover { background: #fef3c7; border-color: #fcd34d; }
+  .tbtn-violet { background: #f5f3ff; color: #7c3aed; border-color: #c4b5fd; }
+  .tbtn-violet:hover { background: #ede9fe; border-color: #a78bfa; }
+  .tbtn-cyan { background: #ecfeff; color: #0891b2; border-color: #a5f3fc; }
+  .tbtn-cyan:hover { background: #cffafe; border-color: #67e8f9; }
+  .tbtn-green { background: #059669; color: #fff; border-color: #059669; }
+  .tbtn-green:hover { background: #047857; border-color: #047857; }
+  .tbtn-gray { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+  .tbtn-gray:hover { background: #e2e8f0; border-color: #94a3b8; }
+  .server-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 20px; letter-spacing: 0.02em; }
+  .server-online { background: rgba(16,185,129,0.15); color: #10b981; }
+  .server-offline { background: rgba(100,116,139,0.2); color: #94a3b8; }
+  .server-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .server-online .server-dot { background: #10b981; box-shadow: 0 0 6px #10b981; animation: pulse-dot 2s infinite; }
+  .server-offline .server-dot { background: #94a3b8; }
+  @keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+  
+  @media print {
+    .no-print { display: none !important; }
+    body { background: #fff; padding: 0; }
+    .container { box-shadow: none; padding: 0; }
+    input, select, textarea { border: none; background: transparent; -webkit-appearance: none; font-family: inherit; font-size: inherit; color: inherit; padding: 0; resize: none; }
+    .box { border: none; padding: 5px 0; }
+    .doc-parecer-item { border: none; padding: 5px 0; grid-template-columns: 2fr 1fr 3fr; border-bottom: 1px dashed #e2e8f0; box-shadow: none; }
+    .doc-link-input, .doc-link-btn { display: none !important; }
+    .checklist, .summary-card, .req-group { border: 1px solid #cbd5e1; }
+    .req-group { page-break-inside: avoid; }
+    .doc-parecer-row td { padding: 10px 15px 15px 30px !important; border-bottom: 2px solid #cbd5e1 !important; }
+  }
+
+  /* Overlay de Carregamento */
+  #loading-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255, 255, 255, 0.9); z-index: 9999;
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  .spinner {
+    width: 60px; height: 60px; border: 6px solid #e2e8f0; border-top-color: #3b82f6;
+    border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #loading-text { font-size: 20px; font-weight: 600; color: #1e293b; margin-bottom: 10px; }
+  .progress-container { width: 300px; height: 12px; background: #e2e8f0; border-radius: 10px; overflow: hidden; }
+  #loading-bar { height: 100%; background: #3b82f6; width: 0%; transition: width 0.3s ease; }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<!-- Loading Overlay -->
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <div id="loading-text">Processando PDF...</div>
+  <div class="progress-container">
+    <div id="loading-bar"></div>
+  </div>
+</div>
+
+<div class="toolbar no-print">
+  <div class="toolbar-brand">
+    <h2><i class="fa-solid fa-scale-balanced"></i> Assistente de Parecer RSC</h2>
+    <div id="server-status" class="server-badge server-offline"><span class="server-dot"></span> Servidor Offline</div>
+  </div>
+  <div class="toolbar-body">
+    <!-- Linha 1: Gerenciamento de arquivos -->
+    <div class="toolbar-row">
+      <span class="row-label">Parecer:</span>
+      <select id="saved-analyses" onchange="loadSelected()">
+        <option value="">-- Selecione --</option>
+      </select>
+      <button class="tbtn tbtn-outline" onclick="deleteSelected()" title="Apagar análise selecionada"><i class="fa-solid fa-trash-can"></i> Apagar</button>
+      <button class="tbtn tbtn-red" onclick="deleteAllSaved()" title="Apagar tudo"><i class="fa-solid fa-xmark"></i> Apagar Tudo</button>
+      <div class="toolbar-sep"></div>
+      <button class="tbtn tbtn-blue" onclick="exportBackup()" title="Baixar backup"><i class="fa-solid fa-download"></i> Backup</button>
+      <button class="tbtn tbtn-amber" onclick="document.getElementById('backup-upload').click()" title="Restaurar backup"><i class="fa-solid fa-upload"></i> Restaurar</button>
+      <input type="file" id="backup-upload" accept=".json" style="display:none;" onchange="importBackup(event)">
+    </div>
+    <!-- Linha 2: Ações do fluxo de trabalho -->
+    <div class="toolbar-row" style="border-top: 1px solid #f1f5f9; padding-top: 14px;">
+      <span class="row-label">Ações:</span>
+      <button class="tbtn tbtn-outline" onclick="clearData()"><i class="fa-solid fa-file-circle-plus"></i> Novo</button>
+      <button class="tbtn tbtn-violet" onclick="document.getElementById('pdf-upload').click()"><i class="fa-solid fa-file-pdf"></i> Importar PDF</button>
+      <input type="file" id="pdf-upload" accept="application/pdf" style="display:none;" onchange="handlePDFUpload(event)">
+      <button class="tbtn tbtn-cyan" onclick="linkSEIFiles()"><i class="fa-solid fa-link"></i> Vincular SEI</button>
+      <div class="toolbar-sep"></div>
+      <button class="tbtn tbtn-gray" onclick="window.print()"><i class="fa-solid fa-print"></i> Imprimir</button>
+      <div class="toolbar-actions">
+        <button class="tbtn tbtn-green" onclick="generateParecerHtml()"><i class="fa-solid fa-file-signature"></i> Gerar Parecer SEI</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="header">
+    <h1>Assistente de Parecer RSC</h1>
+  </div>
+
+  <div class="section-title">1. PARÂMETROS DA AVALIAÇÃO (RSC PRETENDIDO)</div>
+  <div class="grid config-box">
+    <div class="box">
+      <label>Nível RSC Pretendido</label>
+      <select id="cfg-nivel" onchange="updateTargets(); saveData()">
+        <option value="I">RSC I</option>
+        <option value="II">RSC II</option>
+        <option value="III">RSC III</option>
+        <option value="IV">RSC IV</option>
+        <option value="V">RSC V</option>
+        <option value="VI" selected>RSC VI</option>
+      </select>
+    </div>
+    <div class="box">
+      <label>Pontuação Mínima</label>
+      <input type="number" id="cfg-pts" value="75" readonly style="background: transparent; font-weight: bold; border: none; padding-left: 0; font-size: 16px;">
+    </div>
+    <div class="box">
+      <label>Mín. Critérios Específicos</label>
+      <input type="number" id="cfg-crits" value="7" readonly style="background: transparent; font-weight: bold; border: none; padding-left: 0; font-size: 16px;">
+    </div>
+    <div class="box" style="grid-column: span 2;">
+      <label>Requisito Específico (Decreto 13.048/2026)</label>
+      <div id="cfg-req-text" style="font-size: 15px; font-weight: bold; color: #1e40af; margin-top: 8px;">
+        Exige Requisito VI (mín. 1)
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">2. IDENTIFICAÇÃO DO SERVIDOR, PROCESSO E RELATOR</div>
+  <div class="grid">
+    <div class="box"><label>Processo SEI</label><input type="text" id="srv-sei" placeholder="Ex: 23070.000000/2026-00" oninput="saveData(); updateSavedDropdown()"></div>
+    <div class="box"><label>Nome do Servidor</label><input type="text" id="srv-nome" placeholder="Nome completo" oninput="saveData(); updateSavedDropdown()"></div>
+    <div class="box"><label>Matrícula SIAPE</label><input type="text" id="srv-siape" placeholder="Ex: 1234567" oninput="saveData()"></div>
+    <div class="box"><label>Cargo</label><input type="text" id="srv-cargo" placeholder="Ex: Assistente em Administração" oninput="saveData()"></div>
+    <div class="box"><label>Classe</label>
+      <select id="srv-classe" onchange="saveData()">
+        <option value="">Selecione...</option>
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+        <option value="D">D</option>
+        <option value="E">E</option>
+      </select>
+    </div>
+    <div class="box"><label>Data Ingresso Cargo</label><input type="text" id="srv-ingresso" placeholder="DD/MM/AAAA" oninput="saveData()"></div>
+    <div class="box" style="grid-column: span 2;"><label>Lotação</label><input type="text" id="srv-lotacao" placeholder="Ex: Faculdade de Direito" oninput="saveData()"></div>
+    <div class="box"><label>Incentivo (IQ) Atual</label><input type="text" id="srv-iq" placeholder="Ex: Especialização (30%)" oninput="saveData()"></div>
+    <div class="box"><label>Saldo Anterior (pts)</label><input type="number" id="srv-saldo" value="0" oninput="saveData()"></div>
+    <div class="box" style="grid-column: span 2; border-left: 4px solid #10b981;"><label>Nome do Relator(a) do Parecer</label><input type="text" id="srv-relator" placeholder="Seu nome completo" oninput="saveData()"></div>
+  </div>
+
+  <div class="section-title">3. ANÁLISE DOS CRITÉRIOS ESPECÍFICOS</div>
+  
+  <div class="add-form no-print" style="display: none;">
+    <h3>+ Adicionar Novo Critério para Análise</h3>
+    <div class="add-grid">
+      <select id="new-req">
+        <option value="I">Requisito I</option>
+        <option value="II">Requisito II</option>
+        <option value="III">Requisito III</option>
+        <option value="IV">Requisito IV</option>
+        <option value="V">Requisito V</option>
+        <option value="VI">Requisito VI</option>
+      </select>
+      <input type="text" id="new-desc" placeholder="Descrição completa do critério...">
+      <input type="text" id="new-unidade" placeholder="Unidade (ex: Por ano)">
+      <input type="number" id="new-pts" step="0.1" placeholder="Pts por Unidade">
+      <input type="number" id="new-qtd" step="0.5" placeholder="Qtd. Solicitada">
+    </div>
+    <textarea id="new-anexos" rows="3" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 14px; margin-bottom: 12px;" placeholder="Cole os nomes dos arquivos anexos (ex: Anexo_01.pdf). COLOQUE UM POR LINHA. Cada linha gerará um campo de avaliação individual."></textarea>
+    <button class="btn" onclick="addItem()">Adicionar à Tabela</button>
+  </div>
+
+  <div id="criteria-container">
+    <!-- Dynamic Requisito Groups will be injected here -->
+  </div>
+
+  <div class="section-title" style="margin-top: 40px;">4. RESUMO E CONCLUSÃO</div>
+  
+  <table class="req-table">
+    <thead>
+      <tr>
+        <th>Requisito</th>
+        <th style="text-align:center;">Pontos Solicitados</th>
+        <th style="text-align:center;">Pontos Validados</th>
+      </tr>
+    </thead>
+    <tbody id="req-summary-body">
+      <!-- Dynamic Req Summary -->
+    </tbody>
+  </table>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="label">Total Solicitado</div>
+      <div class="value" id="tot-sol">0.00</div>
+    </div>
+    <div class="summary-card highlight">
+      <div class="label">Total Validado</div>
+      <div class="value" id="tot-val">0.00</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">Critérios Atendidos</div>
+      <div class="value" id="tot-crit">0</div>
+    </div>
+  </div>
+
+  <div class="checklist">
+    <div class="checklist-item">
+      <span>Atingiu a pontuação mínima exigida (<span id="lbl-min-pts">75</span> pts)?</span>
+      <span class="check-icon" id="chk-pts">-</span>
+    </div>
+    <div class="checklist-item">
+      <span>Atingiu o número mínimo de critérios específicos (<span id="lbl-min-crit">7</span>)?</span>
+      <span class="check-icon" id="chk-crit">-</span>
+    </div>
+    <div class="checklist-item" id="chk-reqesp-row">
+      <span id="lbl-reqesp-text">Cumpriu o requisito específico obrigatório do nível?</span>
+      <span class="check-icon" id="chk-reqesp">-</span>
+    </div>
+  </div>
+
+  <div id="final-status-box" class="final-status">
+    Aguardando Análise
+  </div>
+
+  <div class="no-print" style="text-align: center; margin-top: 25px;">
+    <button class="btn" style="background: #4b5563; font-size: 15px; padding: 12px 25px;" onclick="copyJustifications()">
+      &#128203; Copiar Justificativas para o Parecer
+    </button>
+  </div>
+
+</div>
+
+<script>
+  let appData = { items: [] };
+  let currentKey = '';
+
+  const levelParams = {
+    'I': { pts: 10, crits: 1, text: 'Não exige requisito específico' },
+    'II': { pts: 15, crits: 2, text: 'Não exige requisito específico' },
+    'III': { pts: 25, crits: 2, text: 'Não exige requisito específico' },
+    'IV': { pts: 30, crits: 3, text: 'Exige Requisito II, IV, V ou VI (mín. 1 critério)' },
+    'V': { pts: 52, crits: 5, text: 'Exige Requisito IV, V ou VI (mín. 1 critério)' },
+    'VI': { pts: 75, crits: 7, text: 'Exige Requisito VI (mín. 1 critério)' }
+  };
+
+  function updateTargets() {
+    const nivel = document.getElementById('cfg-nivel').value;
+    const params = levelParams[nivel];
+    
+    document.getElementById('cfg-pts').value = params.pts;
+    document.getElementById('cfg-crits').value = params.crits;
+    document.getElementById('cfg-req-text').innerText = params.text;
+    
+    renderSummary();
+  }
+
+  function getSaveKey() {
+    let proc = document.getElementById('srv-sei').value.trim();
+    let nome = document.getElementById('srv-nome').value.trim();
+    if(!proc && !nome) return 'RSC_Rascunho_SemNome';
+    // Chave inclui processo e nome para ser única
+    if(proc && nome) return `${proc}__${nome}`;
+    if(proc) return `${proc}__SemNome`;
+    return `SemProcesso__${nome}`;
+  }
+
+  function addItem() {
+    const req = document.getElementById('new-req').value;
+    const desc = document.getElementById('new-desc').value.trim();
+    const unidade = document.getElementById('new-unidade').value.trim();
+    const pts = parseFloat(document.getElementById('new-pts').value) || 0;
+    const qtd = parseFloat(document.getElementById('new-qtd').value) || 0;
+    const anexosRaw = document.getElementById('new-anexos').value;
+
+    if(!desc) { alert("Preencha a descrição do critério."); return; }
+
+    const anexosList = anexosRaw.split('\n').map(l => l.trim()).filter(l => l !== '');
+    const docs = anexosList.map(name => ({ name: name, status: '', just: '', url: '', treeName: '' }));
+
+    const newItem = {
+      id: Date.now().toString(),
+      req: req,
+      desc: desc,
+      unidade: unidade,
+      ptsUnit: pts,
+      qtdSol: qtd,
+      qtdConf: qtd, // default to requested
+      obs: '',
+      docs: docs
+    };
+
+    appData.items.push(newItem);
+    
+    document.getElementById('new-desc').value = '';
+    document.getElementById('new-unidade').value = '';
+    document.getElementById('new-pts').value = '';
+    document.getElementById('new-qtd').value = '';
+    document.getElementById('new-anexos').value = '';
+
+    renderTable();
+    saveData();
+  }
+
+  function removeItem(id) {
+    if(confirm("Deseja realmente remover este critério da análise?")) {
+      appData.items = appData.items.filter(i => i.id !== id);
+      renderTable();
+      saveData();
+    }
+  }
+
+  function updateItem(id, field, val) {
+    const item = appData.items.find(i => i.id === id);
+    if(item) {
+      item[field] = val;
+      if(field === 'qtdConf') {
+        const el = document.getElementById(`val-${id}`);
+        if(el) el.innerText = (item.ptsUnit * (parseFloat(val)||0)).toFixed(2);
+      }
+      renderSummary();
+      saveData();
+    }
+  }
+
+  function updateDoc(itemId, docIndex, field, val) {
+    const item = appData.items.find(i => i.id === itemId);
+    if(item && item.docs[docIndex]) {
+      item.docs[docIndex][field] = val;
+      saveData();
+    }
+  }
+
+  function renderTable() {
+    const container = document.getElementById('criteria-container');
+    container.innerHTML = '';
+    
+    const reqs = ['I', 'II', 'III', 'IV', 'V', 'VI'];
+    
+    reqs.forEach(r => {
+      const items = appData.items.filter(i => i.req === r);
+      if(items.length === 0) return;
+      
+      let groupHtml = `<div class="req-group">
+        <div class="req-group-header">Requisito ${r}</div>
+        <table class="criteria-table">
+          <thead>
+            <tr>
+              <th width="45%">Descrição do Critério Específico e Observações</th>
+              <th width="10%" style="text-align:center;">Pts/Unid</th>
+              <th width="15%" style="text-align:center;">Qtd Solicitada</th>
+              <th width="15%" style="text-align:center;">Qtd Confirmada</th>
+              <th width="15%" style="text-align:center;">Pts Validados</th>
+            </tr>
+          </thead>
+          <tbody>`;
+          
+      items.forEach(item => {
+        const ptsVal = (item.ptsUnit * (parseFloat(item.qtdConf)||0)).toFixed(2);
+        
+        groupHtml += `
+          <tr>
+            <td>
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 8px;">
+                <span style="font-weight:600; font-size:14px; color:#1e293b; line-height:1.4;">${item.desc}</span>
+                <button class="btn-remove no-print" onclick="removeItem('${item.id}')">Excluir</button>
+              </div>
+              <div style="font-size:12px; color:#64748b; margin-top: -4px; margin-bottom: 8px;"><strong>Unidade:</strong> ${item.unidade || 'Não informada'}</div>
+              <textarea class="obs-textarea" placeholder="Observações do relator sobre este critério..." oninput="updateItem('${item.id}', 'obs', this.value)">${item.obs}</textarea>
+            </td>
+            <td style="text-align:center; vertical-align:middle; font-size:15px; color:#475569;">${item.ptsUnit.toFixed(2)}</td>
+            <td style="text-align:center; vertical-align:middle; font-size:15px; color:#475569;">${item.qtdSol}</td>
+            <td style="text-align:center; vertical-align:middle;">
+              <input type="number" class="qty-input" step="0.5" min="0" value="${item.qtdConf}" oninput="updateItem('${item.id}', 'qtdConf', this.value)">
+            </td>
+            <td style="text-align:center; vertical-align:middle; font-weight:bold; color:#2563eb; font-size:18px;" id="val-${item.id}">${ptsVal}</td>
+          </tr>
+        `;
+        
+        if(item.docs && item.docs.length > 0) {
+          let docsHtml = item.docs.map((doc, dIdx) => `
+            <div class="doc-parecer-item">
+              <div>
+                <div class="doc-name">
+                  &#128196; ${doc.name} 
+                  ${doc.url ? `<br><a href="${doc.url}" target="_blank" class="doc-link-btn" style="margin-left:0; margin-top:5px;" title="Abrir no SEI">&#128279; SEI: ${doc.treeName || 'Abrir Anexo'}</a>` : ''}
+                </div>
+                ${doc.url ? '' : `<input type="text" class="doc-link-input no-print" placeholder="Cole o link do SEI aqui (se automático falhar)..." value="${doc.url || ''}" oninput="updateDoc('${item.id}', ${dIdx}, 'url', this.value)">`}
+              </div>
+              <select class="doc-status" onchange="updateDoc('${item.id}', ${dIdx}, 'status', this.value)">
+                <option value="" ${doc.status===''?'selected':''}>Não Avaliado</option>
+                <option value="Aceito" ${doc.status==='Aceito'?'selected':''}>Aceito</option>
+                <option value="Aceito Parcialmente" ${doc.status==='Aceito Parcialmente'?'selected':''}>Aceito Parcialmente</option>
+                <option value="Rejeitado" ${doc.status==='Rejeitado'?'selected':''}>Rejeitado</option>
+              </select>
+              <textarea class="doc-just" rows="1" placeholder="Justificativa da avaliação..." oninput="updateDoc('${item.id}', ${dIdx}, 'just', this.value)">${doc.just}</textarea>
+            </div>
+          `).join('');
+
+          groupHtml += `
+            <tr class="doc-parecer-row">
+              <td colspan="5">
+                <div style="font-size:12px; font-weight:bold; color:#64748b; margin-bottom:10px; text-transform:uppercase;">Avaliação por Documento / Anexo:</div>
+                ${docsHtml}
+              </td>
+            </tr>
+          `;
+        }
+      });
+      
+      groupHtml += `</tbody></table></div>`;
+      container.insertAdjacentHTML('beforeend', groupHtml);
+    });
+
+    renderSummary();
+  }
+
+  function renderSummary() {
+    let reqTotals = { 'I':{s:0,v:0}, 'II':{s:0,v:0}, 'III':{s:0,v:0}, 'IV':{s:0,v:0}, 'V':{s:0,v:0}, 'VI':{s:0,v:0} };
+    let reqCrits = { 'I':0, 'II':0, 'III':0, 'IV':0, 'V':0, 'VI':0 };
+    
+    let totSol = 0, totVal = 0, totCrit = 0;
+
+    appData.items.forEach(item => {
+      let qS = parseFloat(item.qtdSol) || 0;
+      let qV = parseFloat(item.qtdConf) || 0;
+      let pU = item.ptsUnit;
+
+      reqTotals[item.req].s += (qS * pU);
+      reqTotals[item.req].v += (qV * pU);
+      totSol += (qS * pU);
+      totVal += (qV * pU);
+
+      if(qV > 0) {
+        totCrit++;
+        reqCrits[item.req]++;
+      }
+    });
+
+    const rtBody = document.getElementById('req-summary-body');
+    rtBody.innerHTML = '';
+    ['I','II','III','IV','V','VI'].forEach(r => {
+      if(reqTotals[r].s > 0 || reqTotals[r].v > 0) {
+        rtBody.insertAdjacentHTML('beforeend', `
+          <tr>
+            <td style="font-weight:bold; font-size:15px;">Requisito ${r}</td>
+            <td style="text-align:center; font-size:15px; color:#475569;">${reqTotals[r].s.toFixed(2)}</td>
+            <td style="text-align:center; font-weight:bold; color:#2563eb; font-size:16px;">${reqTotals[r].v.toFixed(2)}</td>
+          </tr>
+        `);
+      }
+    });
+
+    document.getElementById('tot-sol').innerText = totSol.toFixed(2);
+    document.getElementById('tot-val').innerText = totVal.toFixed(2);
+    document.getElementById('tot-crit').innerText = totCrit;
+
+    // Config Check
+    const nivel = document.getElementById('cfg-nivel').value;
+    const params = levelParams[nivel];
+
+    document.getElementById('lbl-min-pts').innerText = params.pts;
+    document.getElementById('lbl-min-crit').innerText = params.crits;
+
+    let passPts = totVal >= params.pts;
+    let passCrit = totCrit >= params.crits;
+    
+    let passReqEsp = true;
+    let needsReqCheck = true;
+    
+    document.getElementById('lbl-reqesp-text').innerText = params.text;
+    
+    if(nivel === 'IV') {
+      passReqEsp = (reqCrits['II']>0 || reqCrits['IV']>0 || reqCrits['V']>0 || reqCrits['VI']>0);
+    } else if (nivel === 'V') {
+      passReqEsp = (reqCrits['IV']>0 || reqCrits['V']>0 || reqCrits['VI']>0);
+    } else if (nivel === 'VI') {
+      passReqEsp = (reqCrits['VI']>0);
+    } else {
+      needsReqCheck = false; // I, II, III
+    }
+
+    document.getElementById('chk-reqesp-row').style.display = needsReqCheck ? 'flex' : 'none';
+
+    setCheck('chk-pts', passPts);
+    setCheck('chk-crit', passCrit);
+    if(needsReqCheck) setCheck('chk-reqesp', passReqEsp);
+
+    const finalBox = document.getElementById('final-status-box');
+    if(totSol === 0) {
+      finalBox.className = 'final-status';
+      finalBox.innerText = 'Adicione critérios para iniciar a análise';
+    } else if(passPts && passCrit && (!needsReqCheck || passReqEsp)) {
+      finalBox.className = 'final-status status-aprovado';
+      finalBox.innerText = 'PARECER FAVORÁVEL (REQUISITOS ATENDIDOS)';
+    } else {
+      finalBox.className = 'final-status status-reprovado';
+      finalBox.innerText = 'PARECER DESFAVORÁVEL (REQUISITOS NÃO ATENDIDOS)';
+    }
+  }
+
+  function setCheck(id, pass) {
+    const el = document.getElementById(id);
+    if(pass) {
+      el.innerHTML = '&#10004; Sim';
+      el.className = 'check-icon check-pass';
+    } else {
+      el.innerHTML = '&#10008; Não';
+      el.className = 'check-icon check-fail';
+    }
+  }
+
+  function saveData() {
+    let newKey = getSaveKey();
+    let savedList = JSON.parse(localStorage.getItem('rsc_all_saved') || '{}');
+
+    // Se a chave mudou (porque o nome ou processo SEI mudaram), removemos a duplicata antiga
+    if (currentKey && currentKey !== newKey) {
+      if (savedList[currentKey]) {
+        delete savedList[currentKey];
+      }
+    }
+    currentKey = newKey;
+
+    const state = {
+      cfg: {
+        nivel: document.getElementById('cfg-nivel').value
+      },
+      srv: {
+        nome: document.getElementById('srv-nome').value,
+        sei: document.getElementById('srv-sei').value,
+        siape: document.getElementById('srv-siape').value,
+        cargo: document.getElementById('srv-cargo').value,
+        classe: document.getElementById('srv-classe').value,
+        ingresso: document.getElementById('srv-ingresso').value,
+        lotacao: document.getElementById('srv-lotacao').value,
+        iq: document.getElementById('srv-iq').value,
+        saldo: document.getElementById('srv-saldo').value,
+        relator: document.getElementById('srv-relator').value
+      },
+      items: appData.items
+    };
+    
+    savedList[currentKey] = state;
+    localStorage.setItem('rsc_all_saved', JSON.stringify(savedList));
+    localStorage.setItem('rsc_last_key', currentKey);
+    
+    updateSavedDropdown();
+  }
+
+  function loadData(keyToLoad) {
+    let savedList = JSON.parse(localStorage.getItem('rsc_all_saved') || '{}');
+    let state = savedList[keyToLoad];
+    
+    if(state) {
+      if(state.cfg) {
+        document.getElementById('cfg-nivel').value = state.cfg.nivel || 'VI';
+        updateTargets();
+      }
+      if(state.srv) {
+        document.getElementById('srv-nome').value = state.srv.nome || '';
+        document.getElementById('srv-sei').value = state.srv.sei || '';
+        document.getElementById('srv-siape').value = state.srv.siape || '';
+        document.getElementById('srv-cargo').value = state.srv.cargo || '';
+        document.getElementById('srv-classe').value = state.srv.classe || '';
+        document.getElementById('srv-ingresso').value = state.srv.ingresso || '';
+        document.getElementById('srv-lotacao').value = state.srv.lotacao || '';
+        document.getElementById('srv-iq').value = state.srv.iq || '';
+        document.getElementById('srv-saldo').value = state.srv.saldo || '0';
+        document.getElementById('srv-relator').value = state.srv.relator || '';
+      }
+      appData.items = state.items || [];
+      currentKey = keyToLoad;
+      renderTable();
+    }
+  }
+
+  function updateSavedDropdown() {
+    let saves = JSON.parse(localStorage.getItem('rsc_all_saved') || '{}');
+    let select = document.getElementById('saved-analyses');
+    select.innerHTML = '<option value="">-- Selecione uma análise salva --</option>';
+    
+    Object.keys(saves).forEach(k => {
+      let opt = document.createElement('option');
+      opt.value = k;
+      
+      // Mostra nome + processo SEI no dropdown
+      let state = saves[k];
+      let nome = (state && state.srv && state.srv.nome) ? state.srv.nome : '';
+      let sei = (state && state.srv && state.srv.sei) ? state.srv.sei : '';
+      let displayName = nome || k;
+      if (sei) displayName += ' — ' + sei;
+      opt.textContent = displayName;
+      
+      if(k === currentKey) opt.selected = true;
+      select.appendChild(opt);
+    });
+  }
+
+  function loadSelected() {
+    const key = document.getElementById('saved-analyses').value;
+    if(key) {
+      loadData(key);
+    }
+  }
+
+  function deleteSelected() {
+    const key = document.getElementById('saved-analyses').value;
+    if(!key) {
+      alert("Selecione um parecer para apagar."); return;
+    }
+    if(confirm(`Tem certeza que deseja apagar a análise: ${key}?`)) {
+      let savedList = JSON.parse(localStorage.getItem('rsc_all_saved') || '{}');
+      delete savedList[key];
+      localStorage.setItem('rsc_all_saved', JSON.stringify(savedList));
+      clearData(true);
+    }
+  }
+
+  function deleteAllSaved() {
+    let savedList = JSON.parse(localStorage.getItem('rsc_all_saved') || '{}');
+    if(Object.keys(savedList).length === 0) {
+      alert("Não há análises salvas para apagar.");
+      return;
+    }
+    if(confirm("ATENÇÃO: Você está prestes a APAGAR TODAS as análises salvas do seu navegador permanentemente!\n\nRecomenda-se fazer um Backup primeiro.\n\nDeseja realmente APAGAR TUDO?")) {
+      localStorage.removeItem('rsc_all_saved');
+      localStorage.removeItem('rsc_last_key');
+      clearData(true);
+      alert("Todos os dados foram apagados com sucesso.");
+    }
+  }
+
+  function clearData(force = false) {
+    if(force || confirm("Isso irá limpar a tela para criar um novo parecer. Continuar?")) {
+      document.getElementById('srv-sei').value = '';
+      document.getElementById('srv-nome').value = '';
+      document.getElementById('srv-siape').value = '';
+      document.getElementById('srv-cargo').value = '';
+      document.getElementById('srv-classe').value = '';
+      document.getElementById('srv-ingresso').value = '';
+      document.getElementById('srv-lotacao').value = '';
+      document.getElementById('srv-iq').value = '';
+      document.getElementById('srv-saldo').value = '0';
+      // Nota: srv-relator não é apagado propositalmente para facilitar a vida do relator
+
+      appData.items = [];
+      currentKey = 'RSC_Rascunho_SemNome';
+      
+      updateTargets();
+      renderTable();
+      updateSavedDropdown();
+      document.getElementById('saved-analyses').value = '';
+    }
+  }
+
+  // ----------- BACKUP E RESTAURAÇÃO -----------
+  function exportBackup() {
+    let savedList = localStorage.getItem('rsc_all_saved') || '{}';
+    if(savedList === '{}') {
+      alert("Não há dados salvos para fazer backup.");
+      return;
+    }
+    const blob = new Blob([savedList], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    
+    // Nome do arquivo com data
+    const dateStr = new Date().toISOString().split('T')[0];
+    a.download = `Backup_RSC_${dateStr}.json`;
+    document.body.appendChild(a);
+    a.click();
+    
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function importBackup(event) {
+    const file = event.target.files[0];
+    if(!file) return;
+    event.target.value = ''; // reseta o input
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const importedData = JSON.parse(e.target.result);
+        if(typeof importedData !== 'object' || Array.isArray(importedData)) {
+          throw new Error("Formato inválido.");
+        }
+        
+        let existingList = JSON.parse(localStorage.getItem('rsc_all_saved') || '{}');
+        let importedCount = 0;
+        
+        // Fazer merge dos dados importados. Se a chave já existir, sobrescreve.
+        for(let key in importedData) {
+          existingList[key] = importedData[key];
+          importedCount++;
+        }
+        
+        localStorage.setItem('rsc_all_saved', JSON.stringify(existingList));
+        updateSavedDropdown();
+        alert(`Backup restaurado com sucesso! ${importedCount} análises importadas.`);
+      } catch(err) {
+        console.error(err);
+        alert("Erro ao ler o arquivo de backup. Certifique-se de que é um arquivo .json válido gerado pela ferramenta.");
+      }
+    };
+    reader.readAsText(file);
+  }
+  // ------------------------------------------
+
+  // ========== INTEGRAÇÃO COM SERVIDOR PYTHON ==========
+  let hfOnline = false;
+  let localOnline = false;
+  const hfServerUrl = 'https://welmaccou-rsc.hf.space';
+  const localServerUrl = 'http://localhost:5555';
+
+  async function checkServerHealth() {
+    try {
+      const respHF = await fetch(hfServerUrl + '/health', { signal: AbortSignal.timeout(3000) });
+      hfOnline = respHF.ok;
+    } catch(e) { hfOnline = false; }
+    
+    try {
+      const respLoc = await fetch(localServerUrl + '/health', { signal: AbortSignal.timeout(2000) });
+      localOnline = respLoc.ok;
+    } catch(e) { localOnline = false; }
+
+    const badge = document.getElementById('server-status');
+    if (hfOnline || localOnline) {
+      badge.className = 'server-badge server-online';
+      let text = '<span class="server-dot"></span> Online';
+      if (hfOnline && localOnline) text += ' (HF + Local OCR)';
+      else if (localOnline) text += ' (Local OCR)';
+      else text += ' (HF Digital)';
+      badge.innerHTML = text;
+    } else {
+      badge.className = 'server-badge server-offline';
+      badge.innerHTML = '<span class="server-dot"></span> Servidor Offline';
+    }
+  }
+
+  function applyParsedData(data) {
+    // Preenche dados do servidor
+    const srv = data.servidor || {};
+    if (srv.nome) document.getElementById('srv-nome').value = srv.nome;
+    if (srv.siape) document.getElementById('srv-siape').value = srv.siape;
+    if (srv.cargo) document.getElementById('srv-cargo').value = srv.cargo;
+    if (srv.lotacao) document.getElementById('srv-lotacao').value = srv.lotacao;
+    if (srv.iq) document.getElementById('srv-iq').value = srv.iq;
+    if (srv.saldo) document.getElementById('srv-saldo').value = srv.saldo;
+    if (srv.nivel) {
+      document.getElementById('cfg-nivel').value = srv.nivel;
+      updateTargets();
+    }
+
+    // Preenche critérios
+    let addedCount = 0;
+    (data.criterios || []).forEach(crit => {
+      const docs = (crit.anexos || []).map(name => ({ name, status: '', just: '', url: '', treeName: '' }));
+      appData.items.push({
+        id: Date.now().toString() + Math.random().toString(36).substring(7),
+        req: crit.grupo || 'I',
+        desc: crit.descricao || 'Critério sem descrição',
+        unidade: crit.unidade || '',
+        ptsUnit: crit.pts_unitario || 0,
+        qtdSol: crit.qtde || 0,
+        qtdConf: crit.qtde || 0,
+        obs: '',
+        docs: docs
+      });
+      addedCount++;
+    });
+
+    if (addedCount > 0) {
+      renderTable();
+      saveData();
+    }
+    return addedCount;
+  }
+
+  async function handlePDFUpload(event) {
+    const file = event.target.files[0];
+    if(!file) return;
+    
+    // reset input
+    event.target.value = '';
+    
+    // Mostrar overlay
+    const overlay = document.getElementById('loading-overlay');
+    const loadingText = document.getElementById('loading-text');
+    const loadingBar = document.getElementById('loading-bar');
+    overlay.style.display = 'flex';
+    loadingText.innerText = 'Iniciando leitura...';
+    loadingBar.style.width = '0%';
+
+    // ---- TENTATIVA 1: Servidor Python (pdfplumber + OCR) ----
+    if (hfOnline || localOnline) {
+      let progressInterval;
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        let serverToUse = hfOnline ? hfServerUrl : localServerUrl;
+        
+        // Start polling progress
+        progressInterval = setInterval(async () => {
+          try {
+            const pResp = await fetch(serverToUse + '/progress');
+            if (pResp.ok) {
+              const pData = await pResp.json();
+              loadingText.innerText = pData.status || 'Processando PDF...';
+              loadingBar.style.width = pData.percent + '%';
+            }
+          } catch(e) {}
+        }, 500);
+
+        let resp = await fetch(serverToUse + '/parse', { method: 'POST', body: formData });
+        
+        // Se o HF disser que precisa de OCR (422) e o local estiver online, tenta o local
+        if (resp.status === 422 && serverToUse === hfServerUrl) {
+            if (localOnline) {
+                serverToUse = localServerUrl;
+                loadingText.innerText = 'PDF Escaneado detectado. Redirecionando para servidor local com OCR...';
+                resp = await fetch(serverToUse + '/parse', { method: 'POST', body: formData });
+            } else {
+                clearInterval(progressInterval);
+                overlay.style.display = 'none';
+                alert("Este PDF parece ser escaneado (requer OCR). O servidor online (Hugging Face) não possui OCR. Por favor, inicie o servidor local para processá-lo.");
+                return;
+            }
+        }
+
+        clearInterval(progressInterval);
+        
+        if (resp.ok) {
+          const data = await resp.json();
+          clearData(true); // Limpar dados antes de aplicar os novos
+          const count = applyParsedData(data);
+          const metodo = data.metodo === 'ocr' ? 'OCR (Local)' : (serverToUse === hfServerUrl ? 'pdfplumber (HF)' : 'pdfplumber (Local)');
+          overlay.style.display = 'none';
+          alert(`✅ Memorial importado via servidor Python (${metodo})!\n${count} critério(s) extraído(s).\n\nPróximo passo: Use a extensão no SEI para 'Copiar Links do Processo', depois clique em 'Vincular SEI'.`);
+          return;
+        }
+        // Se o servidor retornou erro, tenta fallback
+        console.warn('Servidor retornou erro, usando fallback PDF.js...');
+      } catch(e) {
+        if(progressInterval) clearInterval(progressInterval);
+        console.warn('Servidor indisponível, usando fallback PDF.js...', e);
+      }
+    }
+
+    // ---- TENTATIVA 2: Fallback com PDF.js (no navegador) ----
+    try {
+      loadingText.innerText = 'Modo fallback ativado (PDF.js)...';
+      loadingBar.style.width = '50%';
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      
+      let fullText = '';
+      for(let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        let lastY = -1;
+        let pageText = '';
+        textContent.items.forEach(item => {
+           if (lastY !== -1 && Math.abs(lastY - item.transform[5]) > 4) {
+               pageText += '\n';
+           }
+           pageText += item.str;
+           lastY = item.transform[5];
+        });
+        fullText += pageText + '\n';
+      }
+      
+      clearData(true); // Limpar dados antes de aplicar os novos
+      parseMemorialText(fullText);
+      if (!(hfOnline || localOnline)) {
+        // Só mostra aviso de fallback se o servidor estava offline
+        // (se o parseMemorialText já mostra seu próprio alert, este é informativo)
+      }
+      overlay.style.display = 'none';
+    } catch(err) {
+      overlay.style.display = 'none';
+      console.error(err);
+      alert("Erro ao ler o arquivo PDF. Tente novamente.");
+      renderSummary();
+    }
+  }
+
+  function parseMemorialText(text) {
+    // Clean up multiple spaces, but PRESERVE NEWLINES.
+    text = text.replace(/[ \t]+/g, ' ').trim();
+    
+    let addedCount = 0;
+    
+    // 1. Dados do Servidor - tenta vários padrões (multiline)
+    const nomeMatch = text.match(/Nome completo:\s*(.*?)\s*(?:Matrícula SIAPE|Matricula SIAPE|SIAPE)/i);
+    if(nomeMatch) document.getElementById('srv-nome').value = nomeMatch[1].trim();
+    
+    const siapeMatch = text.match(/SIAPE:\s*(\d+)/i);
+    if(siapeMatch) document.getElementById('srv-siape').value = siapeMatch[1].trim();
+    
+    const cargoMatch = text.match(/Cargo:\s*(.*?)\s*(?:Setor|Unidade|Incentivo|\n)/i);
+    if(cargoMatch) document.getElementById('srv-cargo').value = cargoMatch[1].trim();
+    
+    const lotacaoMatch = text.match(/lotação:\s*(.*?)\s*(?:Incentivo|Instituição|\n)/i);
+    if(lotacaoMatch) document.getElementById('srv-lotacao').value = lotacaoMatch[1].trim();
+    
+    const iqMatch = text.match(/Incentivo à Qualificação.*?:\s*(.*?)\s*(?:Instituição|Concessão|\n)/i);
+    if(iqMatch) document.getElementById('srv-iq').value = iqMatch[1].trim();
+    
+    const saldoMatch = text.match(/Saldo anterior:\s*(\d+)/i);
+    if(saldoMatch) document.getElementById('srv-saldo').value = saldoMatch[1].trim();
+    
+    // 2. Nível solicitado - tenta vários padrões
+    const nivelMatch = text.match(/Nível RSC solicitado:\s*RSC-?PCCTAE\s*(VI|V|IV|III|II|I)/i)
+                    || text.match(/Nível RSC.*?:\s*RSC-?\s*(VI|V|IV|III|II|I)/i)
+                    || text.match(/RSC\s*(VI|V|IV|III|II|I)/i);
+    if(nivelMatch) {
+      document.getElementById('cfg-nivel').value = nivelMatch[1].toUpperCase();
+      updateTargets();
+    }
+    
+    // 3. Critérios: tenta achar a seção de várias formas
+    let criteriaText = null;
+    
+    // Padrão 1: título com número romano VI e texto exato
+    const p1 = text.split(/VI\s*[\.:]?\s*ROL DE SABERES/i);
+    if(p1.length > 1) criteriaText = ' ' + p1[1].split(/VII\s*[\.:]?\s*DECLARA/i)[0];
+    
+    // Padrão 2: sem o numeral, apenas o título
+    if(!criteriaText) {
+      const p2 = text.split(/ROL DE SABERES E COMPET[EÊ]NCIAS DECLARADOS/i);
+      if(p2.length > 1) criteriaText = ' ' + p2[1].split(/DECLARA[ÇC][AÃ]O DO/i)[0];
+    }
+    
+    // Padrão 3: tudo a partir de "Documentação anexada" ou "Unidade:"
+    if(!criteriaText) {
+      if(text.match(/Unidade[\s:]/i) || text.match(/Documentação anexada[\s:]/i)) {
+        criteriaText = text; 
+      }
+    }
+    
+    if(criteriaText) {
+      // Find all Unidade: anchors to safely bound the criteria
+      let boundaries = [];
+      let regex = /(?:^|\n)\s*(\d{1,2})\s*\.\s+(?=[A-ZÁÉÍÓÚÂÊÔÃÕÇ])/g;
+      let match;
+      while ((match = regex.exec(criteriaText)) !== null) {
+        // Look ahead 500 chars to verify it's a real criteria (contains Unidade:)
+        let substring = criteriaText.substring(match.index, match.index + 500);
+        if (substring.match(/Unidade[\s:]/i) || substring.match(/Qtde[\s:]/i) || substring.match(/Pts[\/\s]*Unit/i)) {
+          boundaries.push(match.index);
+        }
+      }
+      // Se não achou com \n, tenta a busca flexível anterior, mas restrita a letras maiúsculas
+      if (boundaries.length === 0) {
+          regex = /(?:^|\s)(\d{1,2})\s*\.\s+(?=[A-ZÁÉÍÓÚÂÊÔÃÕÇ])/g;
+          while ((match = regex.exec(criteriaText)) !== null) {
+            let substring = criteriaText.substring(match.index, match.index + 500);
+            if (substring.match(/Unidade[\s:]/i) || substring.match(/Qtde[\s:]/i) || substring.match(/Pts[\/\s]*Unit/i)) {
+              boundaries.push(match.index);
+            }
+          }
+      }
+      
+      boundaries.push(criteriaText.length);
+      
+      for(let i = 0; i < boundaries.length - 1; i++) {
+        let blockText = criteriaText.substring(boundaries[i], boundaries[i+1]).trim();
+        blockText = blockText.replace(/^\d{1,2}\s*\.\s*/, '');
+        
+        let descMatch = blockText.match(/^(.*?)\s*Unidade[\s:]/is);
+        let desc = descMatch ? descMatch[1].trim().replace(/\n/g, ' ') : "Critério sem descrição";
+        
+        let unidMatch = blockText.match(/Unidade[\s:]*(.*?)\s*(?:\||Qtde)/i);
+        let unidade = unidMatch ? unidMatch[1].trim() : "";
+        
+        let qtdMatch = blockText.match(/Qtde[\s:]*([\d,]+)/i);
+        let qtd = qtdMatch ? parseFloat(qtdMatch[1].replace(',', '.')) : 0;
+        
+        let ptsMatch = blockText.match(/Pts[\/\s]*Unit[\.:\s]*([\d,]+)/i);
+        let pts = ptsMatch ? parseFloat(ptsMatch[1].replace(',', '.')) : 0;
+        
+        let docMatch = blockText.match(/Documentação anexada[\s:]*(.*?)$/is);
+        let anexosRaw = docMatch ? docMatch[1].trim() : "";
+        
+        let anexos = [];
+        let anexosMatches = anexosRaw.match(/\S+\.pdf/gi);
+        if(anexosMatches) {
+          anexos = anexosMatches.map(a => a.trim());
+        } else {
+          // Fallback para separar os anexos se não tiver .pdf, usando whitespace
+          anexos = anexosRaw.split(/\s+/).filter(a => a.length > 3);
+        }
+        
+        let reqFound = 'I'; // fallback
+        for(let a of anexos) {
+          // Procurar menção de grupo no nome do anexo (Grupo I, GrupoI, Grupo_I, etc.)
+          let gMatch = a.match(/Grupo[_\s]*(VII|VI|V|IV|III|II|I)/i);
+          if(gMatch) {
+            reqFound = gMatch[1].toUpperCase();
+            break;
+          }
+        }
+        
+        // Também tenta extrair o grupo da descrição do critério
+        if(reqFound === 'I') {
+          let gFromDesc = desc.match(/Grupo[_\s]*(VII|VI|V|IV|III|II|I)/i)
+                       || desc.match(/Requisito[_\s]*(VII|VI|V|IV|III|II|I)/i);
+          if(gFromDesc) reqFound = gFromDesc[1].toUpperCase();
+        }
+        
+        if (reqFound === 'VII') reqFound = 'VI';
+        
+        const docs = anexos.map(name => ({ name: name, status: '', just: '', url: '', treeName: '' }));
+        
+        appData.items.push({
+          id: Date.now().toString() + Math.random().toString(36).substring(7),
+          req: reqFound,
+          desc: desc,
+          unidade: unidade,
+          ptsUnit: pts,
+          qtdSol: qtd,
+          qtdConf: qtd,
+          obs: '',
+          docs: docs
+        });
+        
+        addedCount++;
+      }
+      
+      if(addedCount > 0) {
+        renderTable();
+        saveData();
+        alert(`Memorial PDF lido com sucesso! ${addedCount} critério(s) importado(s).\n\nPróximo passo: Use a extensão no SEI para 'Copiar Links do Processo', depois clique no botão azul 'Vincular Links do SEI' nesta ferramenta.`);
+      } else {
+        alert("O PDF foi lido, mas nenhum critério pôde ser extraído.\n\nVerifique se o Memorial segue o padrão com os campos 'Unidade:' e 'Documentação anexada:'.");
+        renderSummary();
+      }
+    } else {
+      alert("Não foi possível identificar a seção de critérios no PDF.\n\nVerifique se o arquivo é o Memorial Descritivo correto, com a seção de 'Rol de Saberes' ou critérios com campo 'Unidade:'.");
+      renderSummary();
+    }
+  }
+
+  function copyJustifications() {
+    let lines = [];
+    let globalIndex = 1;
+    
+    appData.items.forEach(item => {
+      if(item.docs && item.docs.length > 0) {
+        item.docs.forEach(doc => {
+           if (doc.just && doc.just.trim() !== '') {
+               let statusStr = doc.status ? `- ${doc.status}` : '- Não Avaliado';
+               let justStr = `- Justificativa: ${doc.just.trim()}`;
+               
+               let seiNum = 'Num. SEI';
+               if (doc.treeName) {
+                  let match = doc.treeName.match(/\((\d+)\)[^\)]*$/);
+                  if (match) seiNum = match[1];
+               }
+               
+               lines.push(`${globalIndex}º.  ${doc.name} (${seiNum}) ${statusStr} ${justStr}`);
+               globalIndex++;
+           }
+        });
+      }
+    });
+
+    if(lines.length === 0) {
+      alert("Não há documentos com justificativas preenchidas.");
+      return;
+    }
+
+    navigator.clipboard.writeText(lines.join('\n')).then(() => {
+      alert("Justificativas copiadas para a área de transferência com sucesso!");
+    }).catch(err => {
+      console.error(err);
+      alert("Erro ao tentar copiar para a área de transferência.");
+    });
+  }
+
+  function copyParecer(itemId) {
+    const item = appData.items.find(i => i.id === itemId);
+    if(!item || !item.docs) return;
+    
+    let docsSummary = [];
+    item.docs.forEach((doc, idx) => {
+      let statusStr = doc.status ? `- ${doc.status}` : '';
+      let justStr = doc.just ? `- Justificativa: ${doc.just}` : '';
+      
+      // Extrair o número SEI do treeName
+      let seiNum = 'Num. SEI';
+      if (doc.treeName) {
+         let match = doc.treeName.match(/\((\d+)\)[^\)]*$/);
+         if (match) seiNum = match[1];
+      }
+      
+      docsSummary.push(`${idx+1}º. ${doc.name} (${seiNum}) ${statusStr} ${justStr}`);
+    });
+    
+    let text = `Critério: ${item.desc}\n${docsSummary.join('\n')}`;
+    navigator.clipboard.writeText(text).then(() => {
+        alert("Parecer do critério copiado!");
+    });
+  }
+
+  async function linkSEIFiles() {
+    try {
+      const text = await navigator.clipboard.readText();
+      if(!text) throw new Error("Área de transferência vazia.");
+      
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch(e) {
+        throw new Error("O texto copiado não é um formato de dados válido. Você clicou em 'Copiar Links do Processo' no SEI?");
+      }
+
+      if(data.type !== 'SEI_TREE_EXPORT') {
+        throw new Error("Formato inválido. Clique no botão verde 'Copiar Links do Processo' no SEI antes de usar este botão.");
+      }
+      
+      const treeLinks = data.links || [];
+      if(treeLinks.length === 0) {
+        alert("A árvore do processo estava vazia ou os links não foram encontrados.");
+        return;
+      }
+      
+      // Auto-preencher o número do processo SEI no campo correto
+      let processNode = treeLinks.find(l => l.isProcessNumber);
+      if (processNode) {
+          let pInput = document.getElementById('srv-sei');
+          if (pInput) {
+              pInput.value = processNode.text;
+          }
+      }
+      
+      // Auto-preencher dados extraídos do Requerimento
+      if (data.reqData) {
+          if (data.reqData.nome && !document.getElementById('srv-nome').value) {
+              document.getElementById('srv-nome').value = data.reqData.nome;
+          }
+          if (data.reqData.siape && !document.getElementById('srv-siape').value) {
+              document.getElementById('srv-siape').value = data.reqData.siape;
+          }
+          if (data.reqData.cargo && !document.getElementById('srv-cargo').value) {
+              document.getElementById('srv-cargo').value = data.reqData.cargo;
+          }
+          if (data.reqData.lotacao && !document.getElementById('srv-lotacao').value) {
+              document.getElementById('srv-lotacao').value = data.reqData.lotacao;
+          }
+          if (data.reqData.classe) {
+              document.getElementById('srv-classe').value = data.reqData.classe;
+          }
+          if (data.reqData.ingresso) {
+              document.getElementById('srv-ingresso').value = data.reqData.ingresso;
+          }
+      }
+      
+      saveData();
+      
+      let matchCount = 0;
+      
+      // Coletar todos os nomes de arquivos que precisamos encontrar
+      let memorialDocs = [];
+      appData.items.forEach(item => {
+        if(item.docs) {
+          item.docs.forEach(doc => {
+            if(!memorialDocs.includes(doc.name)) memorialDocs.push(doc.name);
+          });
+        }
+      });
+      
+      // TENTATIVA 1: Servidor Python (Fuzzy Matching + Nome Original)
+      if (hfOnline || localOnline) {
+        let serverToUse = hfOnline ? hfServerUrl : localServerUrl;
+        try {
+          const resp = await fetch(serverToUse + '/match-links', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+              memorial_docs: memorialDocs,
+              sei_links: treeLinks
+            })
+          });
+          
+          if (resp.ok) {
+            const result = await resp.json();
+            const matches = result.matches || {};
+            
+            // Aplicar os resultados da IA na nossa tabela
+            appData.items.forEach(item => {
+              if(item.docs) {
+                item.docs.forEach(doc => {
+                  if (matches[doc.name]) {
+                    doc.url = matches[doc.name].url;
+                    // Tenta usar o nome original se existir, senão usa o da arvore
+                    doc.treeName = matches[doc.name].originalName || matches[doc.name].text;
+                    matchCount++;
+                  }
+                });
+              }
+            });
+            
+            renderTable();
+            saveData();
+            alert(`Casamento Inteligente com Python (Fuzzy) concluído!\n${matchCount} documentos encontrados e vinculados.`);
+            return; // Sair para não rodar o fallback!
+          }
+        } catch(e) {
+          console.warn('Servidor Python falhou ao parear links. Tentando fallback local...', e);
+        }
+      }
+      
+      // TENTATIVA 2: Fallback Local (Regex + Heurísticas antigas)
+      console.log('Rodando fallback local de vinculação...');
+      // Função para limpar string e tornar o casamento muito flexível
+      const cleanStr = (str) => {
+        let s = str.toLowerCase()
+                  .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // remove acentos
+                  .replace(/\(\d+\)/g, '')   // Remove o ID do SEI ex: (6403913) ANTES de limpar os espaços!
+                  .replace(/[\s_\-\.\(\)\[\]]/g, '') // remove espaços e caracteres
+                  .replace('pdf', '');       // remove extensão
+                  
+        // O OCR às vezes lê 'GrupoI' como 'Grupol' (com L minúsculo)
+        s = s.replace(/grupol/g, 'grupo1');
+        
+        // Converter números romanos para arábicos
+        s = s.replace(/grupoi(?!i|v|x)/g, 'grupo1')
+             .replace(/grupoii(?!i|v)/g, 'grupo2')
+             .replace(/grupoiii/g, 'grupo3')
+             .replace(/grupoiv/g, 'grupo4')
+             .replace(/grupov(?!i)/g, 'grupo5')
+             .replace(/grupovi/g, 'grupo6');
+             
+        s = s.replace(/criterioi(?!i|v|x)/g, 'criterio1')
+             .replace(/criterioii(?!i|v)/g, 'criterio2')
+             .replace(/criterioiii/g, 'criterio3')
+             .replace(/criterioiv/g, 'criterio4')
+             .replace(/criteriov(?!i)/g, 'criterio5')
+             .replace(/criteriovi/g, 'criterio6');
+             
+        // Remover zeros à esquerda de "anexo" (ex: anexo01 -> anexo1)
+        s = s.replace(/anexo0+/g, 'anexo');
+        
+        return s;
+      };
+      
+      appData.items.forEach(item => {
+        if(item.docs) {
+          item.docs.forEach(doc => {
+             const cleanDocName = cleanStr(doc.name);
+             let found = false;
+             
+             // 1ª Tentativa: Buscar o melhor match (um contém o outro, mas evitando match parcial de números como anexo1 batendo em anexo10)
+             for(let linkObj of treeLinks) {
+                const cleanTreeName = cleanStr(linkObj.text);
+                if (cleanTreeName.length < 3) continue; // Ignora links vazios ou curtos demais (como pastas)
+                
+                // Expressões regulares que garantem que o termo encontrado NÃO seja seguido imediatamente por um número.
+                // Isso impede que "anexo1" seja dado como contido dentro de "anexo10".
+                const escapeRegExp = (string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const treeRegex = new RegExp(escapeRegExp(cleanTreeName) + '(?!\\d)', 'i');
+                const docRegex = new RegExp(escapeRegExp(cleanDocName) + '(?!\\d)', 'i');
+                
+                if(treeRegex.test(cleanDocName) || docRegex.test(cleanTreeName)) {
+                   doc.url = linkObj.url;
+                   doc.treeName = linkObj.text; // Salva o nome bonito da árvore
+                   matchCount++;
+                   found = true;
+                   break;
+                }
+             }
+             
+             // 2ª Tentativa: Heurística de Resgate (Casar apenas pelo número do Anexo)
+             // Como na sua print o memorial diz "Criterio 1" mas na árvore tá "Critério 3", o nome nunca vai bater 100%.
+             // Mas se ambos têm "Anexo 1", "Anexo 2", a gente vincula por isso!
+             if (!found) {
+                const matchDoc = cleanDocName.match(/anexo(\d+)/);
+                if (matchDoc) {
+                    for(let linkObj of treeLinks) {
+                        const cleanTreeName = cleanStr(linkObj.text);
+                        const matchTree = cleanTreeName.match(/anexo(\d+)/);
+                        
+                        if (matchTree && matchDoc[1] === matchTree[1]) {
+                           doc.url = linkObj.url;
+                           doc.treeName = linkObj.text;
+                           matchCount++;
+                           found = true;
+                           break;
+                        }
+                    }
+                }
+             }
+          });
+        }
+      });
+      
+      renderTable();
+      saveData();
+      alert(`Casamento inteligente local concluído!\n${matchCount} documentos encontrados e vinculados com os links reais do SEI.`);
+      
+    } catch(err) {
+      console.error(err);
+      alert("Erro ao vincular links: " + err.message);
+    }
+  }
+
+  window.onload = () => {
+    updateTargets();
+    updateSavedDropdown();
+    
+    let lastKey = localStorage.getItem('rsc_last_key');
+    if(lastKey) {
+      loadData(lastKey);
+      document.getElementById('saved-analyses').value = lastKey;
+    } else {
+      renderSummary();
+    }
+
+    // Verificar status do servidor Python
+    checkServerHealth();
+    setInterval(checkServerHealth, 15000); // a cada 15 segundos
+  };
+  function generateParecerHtml() {
+    saveData();
+    
+    // Coleta todos os dados
+    const processo = document.getElementById('srv-sei').value || "[Preencher Processo]";
+    const nome = document.getElementById('srv-nome').value || "[Preencher Nome]";
+    const siape = document.getElementById('srv-siape').value || "[Preencher SIAPE]";
+    const ingresso = document.getElementById('srv-ingresso').value || "[Preencher Data]";
+    const cargo = document.getElementById('srv-cargo').value || "[Preencher Cargo]";
+    const lotacao = document.getElementById('srv-lotacao').value || "[Preencher Lotação]";
+    const classe = document.getElementById('srv-classe').value || "";
+    const iq = document.getElementById('srv-iq').value || "[Preencher IQ]";
+    const saldo = document.getElementById('srv-saldo').value || "0";
+    const relator = document.getElementById('srv-relator').value || "[NOME DO(A) RELATOR(A)]";
+    const nivel = document.getElementById('cfg-nivel').value; // ex: "V"
+    
+    // Formatar check de classe
+    let classStr = "A ( ) B ( ) C ( ) D ( ) E ( )";
+    if (classe) {
+        classStr = classStr.replace(classe + " ( )", classe + " ( X )");
+    }
+    
+    // Formatar check de RSC
+    let rscStr = "RSC-I ( ) RSC-II ( ) RSC-III ( ) RSC-IV ( ) RSC-V ( ) RSC-VI ( )";
+    if (nivel) {
+        rscStr = rscStr.replace("RSC-" + nivel + " ( )", "RSC-" + nivel + " ( X )");
+    }
+
+    // Irregularidades (exatamente igual ao copyJustifications)
+    let irregularidadesList = [];
+    let globalIndex = 1;
+    appData.items.forEach(item => {
+      if(item.docs && item.docs.length > 0) {
+        item.docs.forEach(doc => {
+           if (doc.just && doc.just.trim() !== '') {
+               let statusStr = doc.status ? `- ${doc.status}` : '- Não Avaliado';
+               let justStr = `- Justificativa: ${doc.just.trim()}`;
+               
+               let seiNum = 'Num. SEI';
+               if (doc.treeName) {
+                  let match = doc.treeName.match(/\((\d+)\)[^\)]*$/);
+                  if (match) seiNum = match[1];
+               }
+               irregularidadesList.push(`${globalIndex}º.  ${doc.name} (${seiNum}) ${statusStr} ${justStr}`);
+               globalIndex++;
+           }
+        });
+      }
+    });
+    
+    let irregularidadesHtml = irregularidadesList.length > 0 
+        ? irregularidadesList.map(i => `<p style="color: blue;">${i}</p>`).join('')
+        : `<p style="color: blue;">Não foram identificadas irregularidades.</p>`;
+
+    // Somatório por Grupos (I a VI)
+    let ptsDec = [0,0,0,0,0,0];
+    let ptsVal = [0,0,0,0,0,0];
+    
+    appData.items.forEach(item => {
+        let anexoIndex = -1;
+        let num = item.req ? item.req.toUpperCase() : '';
+        if (num === 'I') anexoIndex = 0;
+        else if (num === 'II') anexoIndex = 1;
+        else if (num === 'III') anexoIndex = 2;
+        else if (num === 'IV') anexoIndex = 3;
+        else if (num === 'V') anexoIndex = 4;
+        else if (num === 'VI') anexoIndex = 5;
+        
+        let dec = (parseFloat(item.ptsUnit) || 0) * (parseFloat(item.qtdSol) || 0);
+        let val = (parseFloat(item.ptsUnit) || 0) * (parseFloat(item.qtdConf) || 0);
+        
+        if (anexoIndex >= 0) {
+            ptsDec[anexoIndex] += dec;
+            ptsVal[anexoIndex] += val;
+        }
+    });
+
+    let totDec = ptsDec.reduce((a,b)=>a+b, 0);
+    let totVal = ptsVal.reduce((a,b)=>a+b, 0);
+    
+    // Contagem de critérios validados
+    let reqCrits = { 'I':0, 'II':0, 'III':0, 'IV':0, 'V':0, 'VI':0 };
+    let totCrit = 0;
+    appData.items.forEach(item => {
+      let qV = parseFloat(item.qtdConf) || 0;
+      if(qV > 0) {
+        totCrit++;
+        if(reqCrits[item.req] !== undefined) reqCrits[item.req]++;
+      }
+    });
+
+    const params = levelParams[nivel] || { pts: 75, crits: 7 };
+    
+    let passPts = totVal >= params.pts;
+    let passCrit = totCrit >= params.crits;
+    let passReqEsp = true;
+    let needsReqCheck = true;
+    
+    if(nivel === 'IV') {
+      passReqEsp = (reqCrits['II']>0 || reqCrits['IV']>0 || reqCrits['V']>0 || reqCrits['VI']>0);
+    } else if (nivel === 'V') {
+      passReqEsp = (reqCrits['IV']>0 || reqCrits['V']>0 || reqCrits['VI']>0);
+    } else if (nivel === 'VI') {
+      passReqEsp = (reqCrits['VI']>0);
+    } else {
+      needsReqCheck = false;
+    }
+
+    let isDeferido = passPts && passCrit && (!needsReqCheck || passReqEsp);
+
+    let textoConclusao = isDeferido 
+        ? `favoravelmente ao <span style="color: blue;">deferimento</span>`
+        : `pelo <span style="color: red;">indeferimento</span>`;
+
+    // Textos de Fundamentação Técnica por nível
+    const textosFundamentacao = {
+        'I': `A análise da documentação comprobatória apresentada e das informações constantes do memorial evidencia que o(a) requerente desenvolveu, no exercício do cargo ocupado, saberes e competências diferenciados por meio de sua participação em atividades institucionais que demonstram aplicação e ampliação dos conhecimentos necessários à atuação profissional. As experiências comprovadas revelam iniciativa, participação e contribuição para o desenvolvimento das atividades da unidade, evidenciando atuação que ultrapassa a mera execução mecânica das tarefas e demonstra aprimoramento da capacidade profissional no exercício do cargo.<br><br>Considerando o nível de complexidade correspondente ao RSC-PCCTAE I e o atendimento aos critérios específicos e à pontuação mínima estabelecidos no art. 5º e no Anexo correspondente do Decreto nº 13.048/2026, esta Comissão entende que o conjunto das experiências comprovadas é suficiente para caracterizar a existência de saberes e competências diferenciados compatíveis com o nível pleiteado.<br><br>O conjunto dessas atividades extrapola o desempenho ordinário do cargo de <span style="color: blue;">${cargo}</span>, demonstrando ampliação de responsabilidades e contribuição direta para a qualidade dos serviços prestados pela unidade.`,
+        'II': `A análise do conjunto documental e do memorial apresentado demonstra que o(a) requerente desenvolveu saberes e competências diferenciados a partir de experiências profissionais realizadas no exercício do cargo, evidenciando participação ativa em atividades institucionais, desenvolvimento de conhecimentos aplicados e capacidade de atuação em situações que demandaram maior envolvimento, responsabilidade e articulação com as atividades desenvolvidas pela unidade.<br><br>As experiências apresentadas demonstram não apenas a realização das atividades inerentes ao cargo, mas também o desenvolvimento de competências que qualificaram sua atuação profissional, especialmente pela participação em atividades institucionais que demandaram conhecimentos, iniciativa, organização, articulação e responsabilidade diferenciados.<br><br>Considerando o nível de complexidade correspondente ao RSC-PCCTAE II, bem como o atendimento à pontuação mínima e aos dois critérios específicos exigidos pelo art. 5º do Decreto nº 13.048/2026, esta Comissão considera demonstrado que a trajetória apresentada se encontra compatível com o padrão de saberes e competências requerido para o nível pleiteado.<br><br>O conjunto dessas atividades extrapola o desempenho ordinário do cargo de <span style="color: blue;">${cargo}</span>, demonstrando ampliação de responsabilidades e contribuição direta para a qualidade dos serviços prestados pela unidade.`,
+        'III': `A análise da trajetória profissional apresentada evidencia o desenvolvimento de saberes e competências diferenciados, decorrentes da experiência acumulada pelo(a) requerente no exercício do cargo, com atuação em atividades institucionais que demandaram conhecimentos aplicados, capacidade de organização, articulação, responsabilidade e solução de situações relacionadas ao funcionamento da unidade.<br><br>As atividades comprovadas demonstram evolução na capacidade de atuação profissional, com aplicação prática dos conhecimentos adquiridos e participação em iniciativas que contribuíram para o aprimoramento dos processos de trabalho e para a consecução das atividades institucionais. Verifica-se, portanto, que a experiência profissional apresentada não se limita à execução ordinária das atribuições do cargo, mas evidencia desenvolvimento de competências e ampliação da capacidade de contribuição para os resultados da instituição.<br><br>Considerando o nível de complexidade correspondente ao RSC-PCCTAE III, o atendimento à pontuação mínima de 25 pontos e aos dois critérios específicos previstos no art. 5º do Decreto nº 13.048/2026, esta Comissão entende que o conjunto da trajetória profissional apresentada demonstra saberes e competências compatíveis com o nível de reconhecimento pleiteado.<br><br>O conjunto dessas atividades extrapola o desempenho ordinário do cargo de <span style="color: blue;">${cargo}</span>, demonstrando ampliação de responsabilidades e contribuição direta para a qualidade dos serviços prestados pela unidade.`,
+        'IV': `A análise do memorial e da documentação comprobatória demonstra que o(a) requerente desenvolveu, ao longo de sua trajetória profissional no exercício do cargo, saberes e competências diferenciados, evidenciados pela atuação em atividades que demandaram conhecimentos especializados, capacidade de articulação, iniciativa, autonomia e assunção de responsabilidades que qualificaram sua atuação profissional.<br><br>As experiências apresentadas revelam participação efetiva em atividades institucionais e desenvolvimento de competências aplicadas à gestão, ao apoio às atividades acadêmicas e administrativas e/ou a outras ações institucionais, conforme os critérios comprovados no processo. Tais experiências demonstram capacidade de mobilizar conhecimentos e competências para além da execução rotineira das atribuições, contribuindo para o aperfeiçoamento dos processos de trabalho e para a obtenção de resultados institucionais.<br><br>Destaca-se, ainda, que o nível RSC-PCCTAE IV exige, além da pontuação mínima de 30 pontos e do atendimento a três critérios específicos, que pelo menos um deles esteja vinculado aos Requisitos II, IV, V ou VI, nos termos do art. 5º do Decreto nº 13.048/2026. Verificado o atendimento dessas condições no presente processo, esta Comissão considera demonstrado o padrão de saberes e competências correspondente ao nível pleiteado.<br><br>O conjunto dessas atividades extrapola o desempenho ordinário do cargo de <span style="color: blue;">${cargo}</span>, demonstrando ampliação de responsabilidades e contribuição direta para a qualidade dos serviços prestados pela unidade.`,
+        'V': `A análise da trajetória profissional, do memorial e dos documentos comprobatórios evidencia o desenvolvimento de saberes e competências diferenciados em nível de maior complexidade, decorrentes da experiência profissional acumulada pelo(a) requerente no exercício do cargo e da participação em atividades que demandaram conhecimentos especializados, autonomia, capacidade de articulação, assunção de responsabilidades ampliadas e contribuição para o aprimoramento dos processos e resultados institucionais.<br><br>O conjunto das experiências demonstra atuação profissional qualificada, com mobilização de conhecimentos e competências desenvolvidos ao longo da carreira e aplicados em situações que ultrapassaram a execução ordinária das atribuições do cargo. As atividades comprovadas revelam capacidade de atuar em contextos institucionais que exigiram maior grau de responsabilidade, articulação, iniciativa e domínio técnico, produzindo impactos positivos para a unidade e/ou para a instituição.<br><br>Ressalta-se que, para o RSC-PCCTAE V, o art. 5º do Decreto nº 13.048/2026 estabelece a necessidade de obtenção de, no mínimo, 52 pontos e atendimento de cinco critérios específicos, sendo pelo menos um deles vinculado aos Requisitos IV, V ou VI. Verificado o atendimento dessas condições e considerando a consistência do conjunto de experiências apresentadas, esta Comissão entende que a trajetória profissional demonstra saberes e competências diferenciados compatíveis com o padrão de complexidade exigido para o nível V.<br><br>O conjunto dessas atividades extrapola o desempenho ordinário das atribuições do cargo de <span style="color: blue;">${cargo}</span>, evidenciando desenvolvimento de saberes e competências, ampliação de responsabilidades e contribuição para o aprimoramento dos processos de trabalho e para a consecução de resultados institucionais relevantes, de acordo com o nível de complexidade correspondente ao RSC-PCCTAE pleiteado.`,
+        'VI': `A análise integral do memorial e da documentação comprobatória apresentada evidencia trajetória profissional marcada pelo desenvolvimento de saberes e competências diferenciados em elevado nível de complexidade, decorrentes da atuação do(a) requerente no exercício do cargo e da produção, prospecção, aplicação e/ou difusão de conhecimentos científicos ou técnicos, associados às demais experiências profissionais comprovadas.<br><br>As atividades apresentadas demonstram domínio e aplicação de conhecimentos que qualificam de forma significativa a atuação profissional, bem como a capacidade de contribuir para o aprimoramento de processos, práticas e resultados institucionais. Evidencia-se, ainda, trajetória caracterizada por maior autonomia, responsabilidade, capacidade técnica e contribuição para a disseminação de conhecimentos e para o desenvolvimento institucional, em consonância com os requisitos de maior complexidade previstos no Decreto nº 13.048/2026.<br><br>Para o RSC-PCCTAE VI, o art. 5º estabelece a exigência de, no mínimo, 75 pontos e sete critérios específicos, com pelo menos um deles vinculado ao Requisito VI — produção, prospecção e difusão de conhecimento científico ou técnico. Considerando o atendimento desses requisitos e a análise qualitativa do conjunto da trajetória profissional, este/esta relator/relatora atesta que as experiências apresentadas demonstram saberes e competências diferenciados compatíveis com o mais elevado nível de reconhecimento previsto no Decreto.<br><br>O conjunto dessas atividades extrapola o desempenho ordinário das atribuições do cargo de <span style="color: blue;">${cargo}</span>, evidenciando o desenvolvimento de saberes e competências, a ampliação de responsabilidades e a contribuição para o aprimoramento dos processos de trabalho e para a consecução de resultados institucionais relevantes, de acordo com o nível de complexidade correspondente ao RSC-PCCTAE pleiteado.`
+    };
+    
+    let fundamentacao = textosFundamentacao[nivel] || "<p>Nível não selecionado.</p>";
+    
+    let saldoRow = Number(saldo) > 0 ? "Atende" : "Não se aplica";
+
+    const html = `<div style="font-family: Arial, sans-serif; font-size: 11pt; line-height: 1.5; padding: 20px;">
+    <p style="text-align: center; margin-bottom: 20px;"><strong>COMISSÃO DE RECONHECIMENTO DE SABERES E COMPETÊNCIAS (CRSC-PCCTAE/UFG)</strong></p>
+
+    <table border="1" cellpadding="5" cellspacing="0" style="width: 100%; border-collapse: collapse; margin-bottom: 20px; border: 1px solid black;">
+        <tr><td width="40%" style="border: 1px solid black;"><strong>Nº do processo SEI:</strong></td><td style="color: blue; border: 1px solid black;">\${processo}</td></tr>
+        <tr><td style="border: 1px solid black;"><strong>Requerente:</strong></td><td style="color: blue; border: 1px solid black;">\${nome}</td></tr>
+        <tr><td style="border: 1px solid black;"><strong>Matrícula SIAPE:</strong></td><td style="color: blue; border: 1px solid black;">\${siape}</td></tr>
+        <tr><td style="border: 1px solid black;"><strong>Data de ingresso no cargo atual:</strong></td><td style="color: blue; border: 1px solid black;">\${ingresso}</td></tr>
+        <tr><td style="border: 1px solid black;"><strong>Cargo / Lotação:</strong></td><td style="color: blue; border: 1px solid black;">\${cargo} / \${lotacao}</td></tr>
+        <tr><td style="border: 1px solid black;"><strong>Nível de Classificação:</strong></td><td style="color: blue; border: 1px solid black;">\${classificacaoStr}</td></tr>
+        <tr><td style="border: 1px solid black;"><strong>Nível de RSC-PCCTAE pretendido:</strong></td><td style="color: blue; border: 1px solid black;">\${rscStr}</td></tr>
+        <tr><td style="border: 1px solid black;"><strong>Nível de Incentivo à Qualificação atual:</strong></td><td style="color: blue; border: 1px solid black;">\${iq}</td></tr>
+        <tr><td style="border: 1px solid black;"><strong>Saldo de pontos de concessão anterior:</strong></td><td style="color: blue; border: 1px solid black;">\${saldo} pontos</td></tr>
+    </table>
+
+    <p><strong>1. RELATÓRIO</strong></p>
+    <p>1.1. Trata o presente parecer da análise do requerimento de Reconhecimento de Saberes e Competências (RSC-PCCTAE) apresentado pelo(a) servidor(a) e autuado no processo SEI acima identificados, instruído nos termos do Decreto nº 13.048, de 3 de julho de 2026, e da Instrução Normativa da UFG nº 01/2026, que disciplina a matéria no âmbito desta Instituição.</p>
+    <p>1.2. O requerimento tem por objeto o reconhecimento do nível <span style="color: blue;">\${nivel}</span> de RSC-PCCTAE, com base nos saberes e competências descritos no memorial apresentado pelo(a) servidor(a), nos termos do art. 13, caput, inciso II, e § 1º, do Decreto nº 13.048/2026, e da tabela de pontuação constante dos Anexos I a VI do referido Decreto.</p>
+
+    <p><strong>2. ANÁLISE DA INSTRUÇÃO PROCESSUAL</strong></p>
+    <p>2.1. A regularidade da instrução processual foi verificada com base no rol de requisitos abaixo, extraídos do Decreto nº 13.048/2026, de modo a conferir segurança ao encaminhamento formulado ao final.</p>
+
+    <table border="1" cellpadding="5" cellspacing="0" style="width: 100%; border-collapse: collapse; margin-bottom: 20px; border: 1px solid black;">
+        <tr style="background-color: #3b82f6; color: white; font-weight: bold;">
+            <th width="5%" style="border: 1px solid black;">Nº</th><th width="45%" style="border: 1px solid black;">Requisito</th><th width="35%" style="border: 1px solid black;">Fundamentação (Decreto nº 13.048/2026)</th><th width="15%" style="border: 1px solid black;">Situação</th>
+        </tr>
+        <tr><td style="border: 1px solid black;">1</td><td style="border: 1px solid black;">Formulário padrão preenchido, contendo identificação funcional, nível de RSC-PCCTAE pleiteado e saldo de pontos de concessão anterior, se houver.</td><td style="border: 1px solid black;">Art. 13, caput, inciso I, alíneas "a" e "b"</td><td style="color: blue; border: 1px solid black;">Atende</td></tr>
+        <tr><td style="border: 1px solid black;">2</td><td style="border: 1px solid black;">Declaração de conformidade de que as atividades e experiências ocorreram e de que os pontos não foram utilizados em concessões anteriores.</td><td style="border: 1px solid black;">Art. 13, caput, inciso I, alínea "c"; art. 5º, § 3º</td><td style="color: blue; border: 1px solid black;">Atende</td></tr>
+        <tr><td style="border: 1px solid black;">3</td><td style="border: 1px solid black;">Memorial descritivo da trajetória profissional e individual, compatível com o nível de RSC-PCCTAE pretendido.</td><td style="border: 1px solid black;">Art. 13, caput, inciso II, e § 1º</td><td style="color: blue; border: 1px solid black;">Atende</td></tr>
+        <tr><td style="border: 1px solid black;">4</td><td style="border: 1px solid black;">Documentação comprobatória correspondente aos itens pontuados, conforme os Anexos I a VI.</td><td style="border: 1px solid black;">Art. 13, caput, inciso III; art. 4º e parágrafo único</td><td style="color: blue; border: 1px solid black;">Atende</td></tr>
+        <tr><td style="border: 1px solid black;">5</td><td style="border: 1px solid black;">Compatibilidade entre a atividade/titulação comprovada e o efetivo exercício do cargo, não se tratando de desempenho ordinário das atribuições.</td><td style="border: 1px solid black;">Art. 5º, § 4º</td><td style="color: blue; border: 1px solid black;">Atende</td></tr>
+        <tr><td style="border: 1px solid black;">6</td><td style="border: 1px solid black;">Extrato/Ficha funcional/SIAPE atualizado, comprovando cargo, nível de classificação e padrão atuais.</td><td style="border: 1px solid black;">Ficha funcional - SIAPE</td><td style="color: blue; border: 1px solid black;">Atende</td></tr>
+        <tr><td style="border: 1px solid black;">7</td><td style="border: 1px solid black;">Comprovação de que o(a) servidor(a) não se encontra em estágio probatório, ressalvada a hipótese do parágrafo único.</td><td style="border: 1px solid black;">Art. 12 e parágrafo único</td><td style="color: blue; border: 1px solid black;">Atende</td></tr>
+        <tr><td style="border: 1px solid black;">8</td><td style="border: 1px solid black;">Observância do interstício mínimo de 3 (três) anos contado da data da última concessão de RSC-PCCTAE.</td><td style="border: 1px solid black;">Art. 11</td><td style="color: blue; border: 1px solid black;">\${saldoRow}</td></tr>
+    </table>
+
+    <p>2.2. Após avaliação minuciosa fica descrito abaixo irregularidades identificadas no devido processo:</p>
+    <div style="margin-bottom: 20px;">
+        \${irregularidadesHtml}
+    </div>
+
+    <p><strong>3. ANÁLISE DE MÉRITO</strong></p>
+    <p>3.1. Atendimento aos requisitos objetivos de indeferimento previstos no art. 14 do Decreto nº 13.048/2026:</p>
+    <ul style="margin-bottom: 20px;">
+        <li>Pontuação e critérios específicos exigidos para o nível pleiteado (art. 5º, caput e § 1º);</li>
+        <li>Utilização única de cada atividade/experiência por critério específico (art. 5º, § 3º);</li>
+        <li>Comprovação documental de todos os itens pontuados (art. 4º);</li>
+        <li>Cumprimento do interstício mínimo de 3 anos desde a última concessão (art. 11);</li>
+        <li>Cumprimento do estágio probatório, ressalvado o parágrafo único do art. 12;</li>
+        <li>Atividades e experiências realizadas no exercício do cargo ocupado (art. 12, parágrafo único)</li>
+        <li>Instrução do requerimento conforme documentação do art. 13;</li>
+        <li>Demonstração de desenvolvimento de saberes/competências além do desempenho ordinário (art. 5º, § 4º, e art. 15).</li>
+    </ul>
+
+    <p>3.2. Referência - pontuação mínima e critérios específicos por nível:</p>
+    <table border="1" cellpadding="5" cellspacing="0" style="width: 100%; border-collapse: collapse; margin-bottom: 20px; border: 1px solid black;">
+        <tr style="background-color: #3b82f6; color: white; font-weight: bold;">
+            <th style="border: 1px solid black;">Nível</th><th style="border: 1px solid black;">Pontuação mínima</th><th style="border: 1px solid black;">Critérios específicos mínimos</th><th style="border: 1px solid black;">Incentivo à Qualificação</th>
+        </tr>
+        <tr><td style="border: 1px solid black;">RSC-PCCTAE I</td><td style="border: 1px solid black;">10 pontos</td><td style="border: 1px solid black;">-</td><td style="border: 1px solid black;">10% do vencimento básico</td></tr>
+        <tr><td style="border: 1px solid black;">RSC-PCCTAE II</td><td style="border: 1px solid black;">15 pontos</td><td style="border: 1px solid black;">2 critérios específicos</td><td style="border: 1px solid black;">15% do vencimento básico</td></tr>
+        <tr><td style="border: 1px solid black;">RSC-PCCTAE III</td><td style="border: 1px solid black;">25 pontos</td><td style="border: 1px solid black;">2 critérios específicos</td><td style="border: 1px solid black;">25% do vencimento básico</td></tr>
+        <tr><td style="border: 1px solid black;">RSC-PCCTAE IV</td><td style="border: 1px solid black;">30 pontos</td><td style="border: 1px solid black;">3 critérios específicos (≥1 dos incisos II, IV, V ou VI do art. 3º)</td><td style="border: 1px solid black;">30% do vencimento básico</td></tr>
+        <tr><td style="border: 1px solid black;">RSC-PCCTAE V</td><td style="border: 1px solid black;">52 pontos</td><td style="border: 1px solid black;">5 critérios específicos (≥1 dos incisos IV, V ou VI do art. 3º)</td><td style="border: 1px solid black;">52% do vencimento básico</td></tr>
+        <tr><td style="border: 1px solid black;">RSC-PCCTAE VI</td><td style="border: 1px solid black;">75 pontos</td><td style="border: 1px solid black;">7 critérios específicos (≥1 do inciso VI do art. 3º)</td><td style="border: 1px solid black;">75% do vencimento básico</td></tr>
+    </table>
+
+    <p>3.3. Pontuação apresentada, por Anexo:</p>
+    <table border="1" cellpadding="5" cellspacing="0" style="width: 100%; border-collapse: collapse; margin-bottom: 20px; border: 1px solid black;">
+        <tr style="background-color: #3b82f6; color: white; font-weight: bold;">
+            <th width="60%" style="border: 1px solid black;">Anexo (Requisito do art. 3º)</th><th width="20%" style="border: 1px solid black;">Pontuação declarada</th><th width="20%" style="border: 1px solid black;">Pontuação validada pelo(a) relator(a)</th>
+        </tr>
+        <tr><td style="border: 1px solid black;">Anexo I - Participação em grupos de trabalho, comissões, comitês, núcleos ou representações (art. 3º, I)</td><td style="color: blue; text-align: center; border: 1px solid black;">\${ptsDec[0].toFixed(2)}</td><td style="color: blue; text-align: center; border: 1px solid black;">\${ptsVal[0].toFixed(2)}</td></tr>
+        <tr><td style="border: 1px solid black;">Anexo II - Participação em projetos institucionais de gestão, ensino, pesquisa, extensão ou inovação (art. 3º, II)</td><td style="color: blue; text-align: center; border: 1px solid black;">\${ptsDec[1].toFixed(2)}</td><td style="color: blue; text-align: center; border: 1px solid black;">\${ptsVal[1].toFixed(2)}</td></tr>
+        <tr><td style="border: 1px solid black;">Anexo III - Premiação em evento de reconhecimento público (art. 3º, III)</td><td style="color: blue; text-align: center; border: 1px solid black;">\${ptsDec[2].toFixed(2)}</td><td style="color: blue; text-align: center; border: 1px solid black;">\${ptsVal[2].toFixed(2)}</td></tr>
+        <tr><td style="border: 1px solid black;">Anexo IV - Designação para responsabilidades técnico-administrativas ou especializadas (art. 3º, IV)</td><td style="color: blue; text-align: center; border: 1px solid black;">\${ptsDec[3].toFixed(2)}</td><td style="color: blue; text-align: center; border: 1px solid black;">\${ptsVal[3].toFixed(2)}</td></tr>
+        <tr><td style="border: 1px solid black;">Anexo V - Exercício de função ou cargo de direção ou de assessoramento institucional (art. 3º, V)</td><td style="color: blue; text-align: center; border: 1px solid black;">\${ptsDec[4].toFixed(2)}</td><td style="color: blue; text-align: center; border: 1px solid black;">\${ptsVal[4].toFixed(2)}</td></tr>
+        <tr><td style="border: 1px solid black;">Anexo VI - Produção, prospecção e difusão de conhecimento científico ou técnico (art. 3º, VI)</td><td style="color: blue; text-align: center; border: 1px solid black;">\${ptsDec[5].toFixed(2)}</td><td style="color: blue; text-align: center; border: 1px solid black;">\${ptsVal[5].toFixed(2)}</td></tr>
+        <tr style="font-weight: bold;"><td style="border: 1px solid black;">TOTAL</td><td style="color: blue; text-align: center; border: 1px solid black;">\${totDec.toFixed(2)}</td><td style="color: blue; text-align: center; border: 1px solid black;">\${totVal.toFixed(2)}</td></tr>
+    </table>
+
+    <p>3.4. Publicação do memorial no sítio eletrônico da UFG:</p>
+    <p>Publicação do memorial descritivo no sítio eletrônico da UFG, com proteção dos dados pessoais do servidor, nos termos do art. 13, § 3º, do Decreto nº 13.048/2026.</p>
+    <p style="color: blue;">Link da publicação:<br></p>
+
+    <p><strong>4. FUNDAMENTAÇÃO TÉCNICA</strong></p>
+    <div style="text-align: justify; margin-bottom: 20px;">
+        \${fundamentacao}
+    </div>
+
+    <p><strong>Dessa forma, manifesto-me \${textoConclusao} da solicitação de RSC-PCCTAE no nível pleiteado, submetendo este parecer à apreciação da Comissão de Reconhecimento de Saberes e Competências – CRSC-PCCTAE.</strong></p>
+
+    <br><br><br>
+    <p style="text-align: center;">_________________________________________<br>
+    <strong>\${relator}</strong></p>
+    </div>`.replace(/\$\{processo\}/g, processo)
+      .replace(/\$\{nome\}/g, nome)
+      .replace(/\$\{siape\}/g, siape)
+      .replace(/\$\{ingresso\}/g, ingresso)
+      .replace(/\$\{cargo\}/g, cargo)
+      .replace(/\$\{lotacao\}/g, lotacao)
+      .replace(/\$\{classificacaoStr\}/g, classStr)
+      .replace(/\$\{rscStr\}/g, rscStr)
+      .replace(/\$\{iq\}/g, iq)
+      .replace(/\$\{saldo\}/g, saldo)
+      .replace(/\$\{nivel\}/g, nivel)
+      .replace(/\$\{saldoRow\}/g, saldoRow)
+      .replace(/\$\{irregularidadesHtml\}/g, irregularidadesHtml)
+      .replace(/\$\{textoConclusao\}/g, textoConclusao)
+      .replace(/\$\{relator\}/g, relator)
+      .replace(/\$\{fundamentacao\}/g, fundamentacao)
+      .replace(/\$\{ptsDec\[0\]\.toFixed\(2\)\}/g, ptsDec[0].toFixed(2).replace('.', ','))
+      .replace(/\$\{ptsVal\[0\]\.toFixed\(2\)\}/g, ptsVal[0].toFixed(2).replace('.', ','))
+      .replace(/\$\{ptsDec\[1\]\.toFixed\(2\)\}/g, ptsDec[1].toFixed(2).replace('.', ','))
+      .replace(/\$\{ptsVal\[1\]\.toFixed\(2\)\}/g, ptsVal[1].toFixed(2).replace('.', ','))
+      .replace(/\$\{ptsDec\[2\]\.toFixed\(2\)\}/g, ptsDec[2].toFixed(2).replace('.', ','))
+      .replace(/\$\{ptsVal\[2\]\.toFixed\(2\)\}/g, ptsVal[2].toFixed(2).replace('.', ','))
+      .replace(/\$\{ptsDec\[3\]\.toFixed\(2\)\}/g, ptsDec[3].toFixed(2).replace('.', ','))
+      .replace(/\$\{ptsVal\[3\]\.toFixed\(2\)\}/g, ptsVal[3].toFixed(2).replace('.', ','))
+      .replace(/\$\{ptsDec\[4\]\.toFixed\(2\)\}/g, ptsDec[4].toFixed(2).replace('.', ','))
+      .replace(/\$\{ptsVal\[4\]\.toFixed\(2\)\}/g, ptsVal[4].toFixed(2).replace('.', ','))
+      .replace(/\$\{ptsDec\[5\]\.toFixed\(2\)\}/g, ptsDec[5].toFixed(2).replace('.', ','))
+      .replace(/\$\{ptsVal\[5\]\.toFixed\(2\)\}/g, ptsVal[5].toFixed(2).replace('.', ','))
+      .replace(/\$\{totDec\.toFixed\(2\)\}/g, totDec.toFixed(2).replace('.', ','))
+      .replace(/\$\{totVal\.toFixed\(2\)\}/g, totVal.toFixed(2).replace('.', ','));
+
+    const blob = new Blob([html], { type: 'text/html' });
+    const clipboardItem = new ClipboardItem({ 'text/html': blob });
+    navigator.clipboard.write([clipboardItem]).then(() => {
+        alert("Parecer Completo copiado com sucesso! Agora basta ir no editor do SEI e apertar Ctrl+V.");
+    }).catch(err => {
+        alert("Falha ao copiar HTML. Seu navegador pode não suportar esta ação. Erro: " + err);
+    });
+  }
+</script>
+</body>
+</html>
