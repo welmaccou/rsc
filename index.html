@@ -864,7 +864,7 @@
         <div class="toolbar-actions">
           <button class="tbtn tbtn-green" onclick="generateParecerHtml()"><i class="fa-solid fa-file-signature"></i>
             Gerar Parecer SEI</button>
-          <button class="tbtn tbtn-indigo" onclick="generateDespachoHtml()"><i class="fa-solid fa-file-signature"></i>
+          <button class="tbtn tbtn-indigo" onclick="openDespachoModal()"><i class="fa-solid fa-file-signature"></i>
             Gerar Despacho SEI</button>
         </div>
       </div>
@@ -2383,13 +2383,58 @@
       });
     }
 
-    function generateDespachoHtml() {
+    function openDespachoModal() {
       saveData();
+      
+      let ptsVal = [0, 0, 0, 0, 0, 0];
+      appData.items.forEach(item => {
+        let anexoIndex = -1;
+        let num = item.req ? item.req.toUpperCase() : '';
+        if (num === 'I') anexoIndex = 0;
+        else if (num === 'II') anexoIndex = 1;
+        else if (num === 'III') anexoIndex = 2;
+        else if (num === 'IV') anexoIndex = 3;
+        else if (num === 'V') anexoIndex = 4;
+        else if (num === 'VI') anexoIndex = 5;
+        let val = (parseFloat(item.ptsUnit) || 0) * (parseFloat(item.qtdConf) || 0);
+        if (anexoIndex >= 0) {
+          ptsVal[anexoIndex] += val;
+        }
+      });
+      let totVal = ptsVal.reduce((a, b) => a + b, 0);
+      let prevSaldo = parseFloat(document.getElementById('srv-saldo').value.replace(',', '.')) || 0;
+      
+      const levelParams = { 'I': 0, 'II': 15, 'III': 25, 'IV': 30, 'V': 52, 'VI': 75 };
+      let nivel = document.getElementById('cfg-nivel').value;
+      let reqPts = levelParams[nivel] || 0;
+      
+      let calcSaldo = (totVal + prevSaldo) - reqPts;
+      if (calcSaldo < 0) calcSaldo = 0;
+      
+      document.getElementById('despacho-saldo').value = calcSaldo.toFixed(2);
+      
+      document.getElementById('despacho-data').valueAsDate = new Date();
+      document.getElementById('despacho-modal').style.display = 'flex';
+    }
+    
+    function closeDespachoModal() {
+      document.getElementById('despacho-modal').style.display = 'none';
+    }
 
+    function confirmDespacho() {
       const processo = document.getElementById('srv-sei').value || "[Preencher Processo]";
       const nome = document.getElementById('srv-nome').value || "[Preencher Nome]";
       const nivel = document.getElementById('cfg-nivel').value || "[Nível]";
-      const saldo = document.getElementById('srv-saldo').value || "0";
+      
+      const inputSaldo = document.getElementById('despacho-saldo').value || "0";
+      const saldoFormatado = parseFloat(inputSaldo).toFixed(2).replace('.', ',');
+      
+      const inputData = document.getElementById('despacho-data').value;
+      let dateStr = "[Data]";
+      if (inputData) {
+        const d = new Date(inputData + 'T12:00:00');
+        dateStr = ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth() + 1)).slice(-2) + "/" + d.getFullYear();
+      }
       
       let iqPercent = "[IQ%]";
       if(nivel === 'I') iqPercent = "10%";
@@ -2399,53 +2444,63 @@
       else if(nivel === 'V') iqPercent = "52%";
       else if(nivel === 'VI') iqPercent = "75%";
       
-      const dateObj = new Date();
-      const dateStr = ("0" + dateObj.getDate()).slice(-2) + "/" + ("0" + (dateObj.getMonth() + 1)).slice(-2) + "/" + dateObj.getFullYear();
+      const html = `<div style="font-family: Arial, sans-serif; font-size: 11pt; line-height: 1.5; padding: 20px; text-align: justify;">
+<div style="background-color: #e5e7eb; padding: 5px; margin-bottom: 10px;"><strong>CONSIDERAÇÕES DA COMISSÃO</strong></div>
+<p style="text-align: justify;">Diante do exposto no presente processo, e apreciada a documentação apresentada pelo servidor <strong>\${nome}</strong>, a Comissão de Reconhecimento de Saberes e Competências (CRSC-PCCTAE/UFG) manifesta-se pelo:</p>
+<p style="text-align: justify;">( X ) DEFERIMENTO do requerimento, com reconhecimento do nível <strong>\${nivel}</strong> de RSC-PCCTAE e do respectivo Incentivo à Qualificação de <strong>\${iqPercent}</strong> sobre o vencimento básico e do saldo de <strong>\${saldoFormatado}</strong> pontos, nos termos do art. 5º, § 1º, do Decreto nº 13.048/2026;</p>
 
-      const html = `<div style="font-family: Arial, sans-serif; font-size: 11pt; line-height: 1.5; padding: 20px;">
-<p style="text-align: center; margin-bottom: 20px;"><strong>UNIVERSIDADE FEDERAL DE GOIÁS<br>COMISSÃO DE AVALIAÇÃO DO RECONHECIMENTO DE SABERES E COMPETÊNCIAS DOS TÉCNICOS ADMINISTRATIVOS EM EDUCAÇÃO</strong></p>
-<p style="text-align: center; margin-bottom: 20px;"><strong>DESPACHO</strong></p>
+<div style="background-color: #e5e7eb; padding: 5px; margin-bottom: 10px; margin-top: 15px;"><strong>DELIBERAÇÃO DA COMISSÃO</strong></div>
+<p style="text-align: justify;">Resultado da votação realizada no dia <strong>\${dateStr}</strong> (quórum de deliberação de dois terços dos membros, nos termos do art. 9º, parágrafo único, do Decreto nº 13.048/2026):</p>
+<p style="text-align: justify;">Favoráveis: <strong>9</strong> Contrários: <strong>0</strong> Abstenções: <strong>0</strong></p>
 
-<p style="background-color: #e5e7eb; padding: 5px;"><strong>CONSIDERAÇÕES DA COMISSÃO</strong></p>
-<p>Diante do exposto no presente processo, e apreciada a documentação apresentada pelo servidor <strong>\${nome}</strong>, a Comissão de Reconhecimento de Saberes e Competências (CRSC-PCCTAE/UFG) manifesta-se pelo:</p>
-<p>( X ) DEFERIMENTO do requerimento, com reconhecimento do nível <strong>\${nivel}</strong> de RSC-PCCTAE e do respectivo Incentivo à Qualificação de <strong>\${iqPercent}</strong> sobre o vencimento básico e do saldo de <strong>\${saldo}</strong> pontos, nos termos do art. 5º, § 1º, do Decreto nº 13.048/2026;</p>
-
-<p style="background-color: #e5e7eb; padding: 5px;"><strong>DELIBERAÇÃO DA COMISSÃO</strong></p>
-<p>Resultado da votação realizada no dia <strong>\${dateStr}</strong> (quórum de deliberação de dois terços dos membros, nos termos do art. 9º, parágrafo único, do Decreto nº 13.048/2026):</p>
-<p>Favoráveis: <strong>9</strong> Contrários: <strong>0</strong> Abstenções: <strong>0</strong></p>
-
-<p style="background-color: #e5e7eb; padding: 5px;"><strong>ENCAMINHAMENTOS</strong></p>
-<p>Encaminhe-se o presente processo:</p>
-<p>À <strong>Diretoria de Administração de Pessoas</strong> as providências cabíveis, notadamente:</p>
-<p style="margin-left: 40px;">a) Emissão de portaria, pela autoridade máxima da UFG, do ato administrativo de concessão do RSC-PCCTAE, nos termos do art. 17 do Decreto nº 13.048/2026.</p>
-<p style="margin-left: 40px;">b) Ciência ao servidor.</p>
+<div style="background-color: #e5e7eb; padding: 5px; margin-bottom: 10px; margin-top: 15px;"><strong>ENCAMINHAMENTOS</strong></div>
+<p style="text-align: justify;">Encaminhe-se o presente processo:</p>
+<p style="text-align: justify;">À <strong>Diretoria de Administração de Pessoas</strong> as providências cabíveis, notadamente:</p>
+<p style="text-align: justify; margin-left: 40px;">a) Emissão de portaria, pela autoridade máxima da UFG, do ato administrativo de concessão do RSC-PCCTAE, nos termos do art. 17 do Decreto nº 13.048/2026.</p>
+<p style="text-align: justify; margin-left: 40px;">b) Ciência ao servidor.</p>
 
 <br><br>
 <p style="text-align: center;">_________________________________________<br>
 Coordenador CRSC-PCCTAE/UFG</p>
-<hr>
-<table style="width: 100%; font-size: 10pt;">
-  <tr>
-    <td style="text-align: left;"><strong>Referência:</strong> Processo nº \${processo}</td>
-    <td style="text-align: right;">SEI nº [Preencher SEI]</td>
-  </tr>
-</table>
-</div>`.replace(/\$\{processo\}/g, processo)
-       .replace(/\$\{nome\}/g, nome)
+</div>`.replace(/\$\{nome\}/g, nome)
        .replace(/\$\{nivel\}/g, nivel)
        .replace(/\$\{iqPercent\}/g, iqPercent)
-       .replace(/\$\{saldo\}/g, saldo)
+       .replace(/\$\{saldoFormatado\}/g, saldoFormatado)
        .replace(/\$\{dateStr\}/g, dateStr);
 
       const blob = new Blob([html], { type: 'text/html' });
       const clipboardItem = new ClipboardItem({ 'text/html': blob });
       navigator.clipboard.write([clipboardItem]).then(() => {
+        closeDespachoModal();
         alert("Despacho copiado com sucesso! Agora basta ir no editor do SEI e apertar Ctrl+V.");
       }).catch(err => {
         alert("Falha ao copiar HTML. Seu navegador pode não suportar esta ação. Erro: " + err);
       });
     }
   </script>
+
+  <!-- Modal Gerar Despacho -->
+  <div id="despacho-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: white; padding: 20px; border-radius: 8px; width: 400px; max-width: 90%; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+      <h3 style="margin-top: 0; margin-bottom: 20px; color: #1e293b;">Gerar Despacho SEI</h3>
+      
+      <div style="margin-bottom: 15px;">
+        <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #334155;">Data da Reunião:</label>
+        <input type="date" id="despacho-data" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box;">
+      </div>
+      
+      <div style="margin-bottom: 15px;">
+        <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #334155;">Saldo de Pontos:</label>
+        <input type="number" id="despacho-saldo" step="0.01" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box;">
+        <small style="color: #64748b; display: block; margin-top: 5px;">Calculado automaticamente: (Total Validado + Saldo Anterior) - Necessário. Edite se necessário.</small>
+      </div>
+
+      <div style="text-align: right; margin-top: 25px;">
+        <button class="btn" style="background: #94a3b8; margin-right: 10px; cursor: pointer;" onclick="closeDespachoModal()">Cancelar</button>
+        <button class="btn" style="background: #4f46e5; cursor: pointer;" onclick="confirmDespacho()">Copiar Despacho</button>
+      </div>
+    </div>
+  </div>
 </body>
 
 </html>
