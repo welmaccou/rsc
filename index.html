@@ -1596,7 +1596,7 @@
           const formData = new FormData();
           formData.append('file', file);
 
-          let serverToUse = hfOnline ? hfServerUrl : localServerUrl;
+          let serverToUse = localOnline ? localServerUrl : hfServerUrl;
 
           // Start polling progress
           progressInterval = setInterval(async () => {
@@ -1690,27 +1690,29 @@
       let addedCount = 0;
 
       // 1. Dados do Servidor - tenta vários padrões (multiline)
-      const nomeMatch = text.match(/Nome completo:\s*(.*?)\s*(?:Matrícula SIAPE|Matricula SIAPE|SIAPE)/i);
+      const nomeMatch = text.match(/Nome completo:\s*(.*?)\s*(?:Matrícula SIAPE|Matricula SIAPE|SIAPE)/i)
+        || text.match(/Nome:\s*(.*?)\s*(?:\n|Nome Social|SIAPE)/i);
       if (nomeMatch) document.getElementById('srv-nome').value = nomeMatch[1].trim();
 
       const siapeMatch = text.match(/SIAPE:\s*(\d+)/i);
       if (siapeMatch) document.getElementById('srv-siape').value = siapeMatch[1].trim();
 
-      const cargoMatch = text.match(/Cargo:\s*(.*?)\s*(?:Setor|Unidade|Incentivo|\n)/i);
+      const cargoMatch = text.match(/Cargo:\s*(.*?)\s*(?:Setor|Unidade|Incentivo|\n|Data)/i);
       if (cargoMatch) document.getElementById('srv-cargo').value = cargoMatch[1].trim();
 
-      const lotacaoMatch = text.match(/lotação:\s*(.*?)\s*(?:Incentivo|Instituição|\n)/i);
+      const lotacaoMatch = text.match(/lotação:\s*(.*?)\s*(?:Incentivo|Instituição|\n|Função)/i);
       if (lotacaoMatch) document.getElementById('srv-lotacao').value = lotacaoMatch[1].trim();
 
       const iqMatch = text.match(/Incentivo à Qualificação.*?:\s*(.*?)\s*(?:Instituição|Concessão|\n)/i);
       if (iqMatch) document.getElementById('srv-iq').value = iqMatch[1].trim();
 
-      const saldoMatch = text.match(/Saldo anterior:\s*(\d+)/i);
+      const saldoMatch = text.match(/Saldo anterior:\s*(\d+)/i) || text.match(/Saldo de Pontuação.*?:\s*(\d+)/i);
       if (saldoMatch) document.getElementById('srv-saldo').value = saldoMatch[1].trim();
 
       // 2. Nível solicitado - tenta vários padrões
       const nivelMatch = text.match(/Nível RSC solicitado:\s*RSC-?PCCTAE\s*(VI|V|IV|III|II|I)/i)
         || text.match(/Nível RSC.*?:\s*RSC-?\s*(VI|V|IV|III|II|I)/i)
+        || text.match(/RSC\s*-\s*(VI|V|IV|III|II|I)\s*\(\s*[xX]\s*\)/i)
         || text.match(/RSC\s*(VI|V|IV|III|II|I)/i);
       if (nivelMatch) {
         document.getElementById('cfg-nivel').value = nivelMatch[1].toUpperCase();
@@ -1735,6 +1737,12 @@
         if (text.match(/Unidade[\s:]/i) || text.match(/Documentação anexada[\s:]/i)) {
           criteriaText = text;
         }
+      }
+
+      // Padrão 4: Requerimento (3. DESCRIÇÃO DAS ATIVIDADES POR REQUISITO LEGAL)
+      if (!criteriaText) {
+        const p4 = text.split(/3\.\s*DESCRI[ÇC][AÃ]O\s+DAS\s+ATIVIDADES/i);
+        if (p4.length > 1) criteriaText = ' ' + p4[1];
       }
 
       if (criteriaText) {
@@ -1971,7 +1979,7 @@
 
         // TENTATIVA 1: Servidor Python (Fuzzy Matching + Nome Original)
         if (hfOnline || localOnline) {
-          let serverToUse = hfOnline ? hfServerUrl : localServerUrl;
+          let serverToUse = localOnline ? localServerUrl : hfServerUrl;
           try {
             const resp = await fetch(serverToUse + '/match-links', {
               method: 'POST',
