@@ -941,7 +941,7 @@
 
     <div class="section-title">3. ANÁLISE DOS CRITÉRIOS ESPECÍFICOS</div>
 
-    <div class="add-form no-print" style="display: none;">
+    <div class="add-form no-print">
       <h3>+ Adicionar Novo Critério para Análise</h3>
       <div class="add-grid">
         <select id="new-req">
@@ -1108,9 +1108,9 @@
       const item = appData.items.find(i => i.id === id);
       if (item) {
         item[field] = val;
-        if (field === 'qtdConf') {
+        if (field === 'qtdConf' || field === 'ptsUnit') {
           const el = document.getElementById(`val-${id}`);
-          if (el) el.innerText = (item.ptsUnit * (parseFloat(val) || 0)).toFixed(2);
+          if (el) el.innerText = ((parseFloat(item.ptsUnit) || 0) * (parseFloat(item.qtdConf) || 0)).toFixed(2);
         }
         renderSummary();
         saveData();
@@ -1162,8 +1162,12 @@
               <div style="font-size:12px; color:#64748b; margin-top: -4px; margin-bottom: 8px;"><strong>Unidade:</strong> ${item.unidade || 'Não informada'}</div>
               <textarea class="obs-textarea" placeholder="Observações do relator sobre este critério..." oninput="updateItem('${item.id}', 'obs', this.value)">${item.obs}</textarea>
             </td>
-            <td style="text-align:center; vertical-align:middle; font-size:15px; color:#475569;">${item.ptsUnit.toFixed(2)}</td>
-            <td style="text-align:center; vertical-align:middle; font-size:15px; color:#475569;">${item.qtdSol}</td>
+            <td style="text-align:center; vertical-align:middle;">
+              <input type="number" class="qty-input" step="0.1" min="0" value="${(parseFloat(item.ptsUnit) || 0).toFixed(2)}" oninput="updateItem('${item.id}', 'ptsUnit', parseFloat(this.value) || 0)">
+            </td>
+            <td style="text-align:center; vertical-align:middle;">
+              <input type="number" class="qty-input" step="0.5" min="0" value="${item.qtdSol}" oninput="updateItem('${item.id}', 'qtdSol', parseFloat(this.value) || 0)">
+            </td>
             <td style="text-align:center; vertical-align:middle;">
               <input type="number" class="qty-input" step="0.5" min="0" value="${item.qtdConf}" oninput="updateItem('${item.id}', 'qtdConf', this.value)">
             </td>
@@ -2393,7 +2397,7 @@
 
     function openDespachoModal() {
       saveData();
-      
+
       let ptsVal = [0, 0, 0, 0, 0, 0];
       appData.items.forEach(item => {
         let anexoIndex = -1;
@@ -2411,20 +2415,20 @@
       });
       let totVal = ptsVal.reduce((a, b) => a + b, 0);
       let prevSaldo = parseFloat(document.getElementById('srv-saldo').value.replace(',', '.')) || 0;
-      
+
       const levelParams = { 'I': 0, 'II': 15, 'III': 25, 'IV': 30, 'V': 52, 'VI': 75 };
       let nivel = document.getElementById('cfg-nivel').value;
       let reqPts = levelParams[nivel] || 0;
-      
+
       let calcSaldo = (totVal + prevSaldo) - reqPts;
       if (calcSaldo < 0) calcSaldo = 0;
-      
+
       document.getElementById('despacho-saldo').value = calcSaldo.toFixed(2);
-      
+
       document.getElementById('despacho-data').valueAsDate = new Date();
       document.getElementById('despacho-modal').style.display = 'flex';
     }
-    
+
     function closeDespachoModal() {
       document.getElementById('despacho-modal').style.display = 'none';
     }
@@ -2433,25 +2437,25 @@
       const processo = document.getElementById('srv-sei').value || "[Preencher Processo]";
       const nome = document.getElementById('srv-nome').value || "[Preencher Nome]";
       const nivel = document.getElementById('cfg-nivel').value || "[Nível]";
-      
+
       const inputSaldo = document.getElementById('despacho-saldo').value || "0";
       const saldoFormatado = parseFloat(inputSaldo).toFixed(2).replace('.', ',');
-      
+
       const inputData = document.getElementById('despacho-data').value;
       let dateStr = "[Data]";
       if (inputData) {
         const d = new Date(inputData + 'T12:00:00');
         dateStr = ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth() + 1)).slice(-2) + "/" + d.getFullYear();
       }
-      
+
       let iqPercent = "[IQ%]";
-      if(nivel === 'I') iqPercent = "10%";
-      else if(nivel === 'II') iqPercent = "15%";
-      else if(nivel === 'III') iqPercent = "25%";
-      else if(nivel === 'IV') iqPercent = "30%";
-      else if(nivel === 'V') iqPercent = "52%";
-      else if(nivel === 'VI') iqPercent = "75%";
-      
+      if (nivel === 'I') iqPercent = "10%";
+      else if (nivel === 'II') iqPercent = "15%";
+      else if (nivel === 'III') iqPercent = "25%";
+      else if (nivel === 'IV') iqPercent = "30%";
+      else if (nivel === 'V') iqPercent = "52%";
+      else if (nivel === 'VI') iqPercent = "75%";
+
       const html = `<div style="font-family: Arial, sans-serif; font-size: 11pt; line-height: 1.5; padding: 20px; text-align: justify;">
 <table width="100%" style="width: 100%; border-collapse: collapse; margin-bottom: 10px;"><tbody><tr><td style="background-color: #e5e7eb; padding: 5px; width: 100%;"><strong>CONSIDERAÇÕES DA COMISSÃO</strong></td></tr></tbody></table>
 <p style="text-align: justify;">Diante do exposto no presente processo, e apreciada a documentação apresentada pelo servidor <strong>\${nome}</strong>, a Comissão de Reconhecimento de Saberes e Competências (CRSC-PCCTAE/UFG) manifesta-se pelo:</p>
@@ -2471,10 +2475,10 @@
 <p style="text-align: center;">_________________________________________<br>
 Coordenador CRSC-PCCTAE/UFG</p>
 </div>`.replace(/\$\{nome\}/g, nome)
-       .replace(/\$\{nivel\}/g, nivel)
-       .replace(/\$\{iqPercent\}/g, iqPercent)
-       .replace(/\$\{saldoFormatado\}/g, saldoFormatado)
-       .replace(/\$\{dateStr\}/g, dateStr);
+        .replace(/\$\{nivel\}/g, nivel)
+        .replace(/\$\{iqPercent\}/g, iqPercent)
+        .replace(/\$\{saldoFormatado\}/g, saldoFormatado)
+        .replace(/\$\{dateStr\}/g, dateStr);
 
       const blob = new Blob([html], { type: 'text/html' });
       const clipboardItem = new ClipboardItem({ 'text/html': blob });
@@ -2488,24 +2492,31 @@ Coordenador CRSC-PCCTAE/UFG</p>
   </script>
 
   <!-- Modal Gerar Despacho -->
-  <div id="despacho-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
-    <div style="background: white; padding: 20px; border-radius: 8px; width: 400px; max-width: 90%; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+  <div id="despacho-modal"
+    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div
+      style="background: white; padding: 20px; border-radius: 8px; width: 400px; max-width: 90%; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
       <h3 style="margin-top: 0; margin-bottom: 20px; color: #1e293b;">Gerar Despacho SEI</h3>
-      
+
       <div style="margin-bottom: 15px;">
         <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #334155;">Data da Reunião:</label>
-        <input type="date" id="despacho-data" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box;">
+        <input type="date" id="despacho-data"
+          style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box;">
       </div>
-      
+
       <div style="margin-bottom: 15px;">
         <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #334155;">Saldo de Pontos:</label>
-        <input type="number" id="despacho-saldo" step="0.01" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box;">
-        <small style="color: #64748b; display: block; margin-top: 5px;">Calculado automaticamente: (Total Validado + Saldo Anterior) - Necessário. Edite se necessário.</small>
+        <input type="number" id="despacho-saldo" step="0.01"
+          style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box;">
+        <small style="color: #64748b; display: block; margin-top: 5px;">Calculado automaticamente: (Total Validado +
+          Saldo Anterior) - Necessário. Edite se necessário.</small>
       </div>
 
       <div style="text-align: right; margin-top: 25px;">
-        <button class="btn" style="background: #94a3b8; margin-right: 10px; cursor: pointer;" onclick="closeDespachoModal()">Cancelar</button>
-        <button class="btn" style="background: #4f46e5; cursor: pointer;" onclick="confirmDespacho()">Copiar Despacho</button>
+        <button class="btn" style="background: #94a3b8; margin-right: 10px; cursor: pointer;"
+          onclick="closeDespachoModal()">Cancelar</button>
+        <button class="btn" style="background: #4f46e5; cursor: pointer;" onclick="confirmDespacho()">Copiar
+          Despacho</button>
       </div>
     </div>
   </div>
